@@ -124,17 +124,6 @@
     var AAA = 1000;
 
     function preload() {
-      selected = false;
-      while (!selected) {
-        planetNUM = prompt("How many planets do you want?",9);
-        astroid = prompt("How many astroids do you want?",0);
-        if (planetNUM != null) {
-          selected = true;
-        }
-        if (astroid != null) {
-          selected = true;
-        }
-      }
       loadLowRes();
       loadAssets();
     }
@@ -225,6 +214,17 @@
       perspective(PI/3.0, width/height, ((height/2.0) / tan(PI*60.0/360.0))/100.0,  ((height/2.0) / tan(PI*60.0/360.0))*Player.viewDistince);
       // ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 10000000000000);
       angleMode(RADIANS);
+      selected = false;
+      while (!selected) {
+        planetNUM = prompt("How many planets do you want?",9);
+        astroid = prompt("How many astroids do you want?",0);
+        if (planetNUM != null) {
+          selected = true;
+        }
+        if (astroid != null) {
+          selected = true;
+        }
+      }
       if (planetNUM - 1 >= 0) {
         Sun = new Planet("Sun",1000,0,.87,0,0,0,0,1,"Sun");
       }if (planetNUM - 2 >= 0) {
