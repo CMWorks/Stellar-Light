@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stellar Light</title>
+    <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
+    <style> body {padding: 0; margin: 0;} </style>
+    <script language="javascript" src="../p5/p5.js"></script>
+    <script language="javascript" src="../p5/p5.sound.js"></script>
+    <script language="javascript" src="../p5/p5.dom.js"></script>
+    <!-- <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.sound.min.js"></script> -->
+    <style>
+      .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: inherit;
+        display: flex;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 15px;
+      }
+      .button:hover {
+        background-color: #67e562;
+      }
+      .PlanetButton {
+        color: white;
+        border: 3px solid blue;
+      }
+      .PlanetButton:hover {
+        border: 2px solid #09D9E6;
+      }
+      .CreateButton {
+        background: url(UI-Textures/create.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        border: 3px solid Indigo;
+      }
+      .CreateButton:hover {
+        border: 2px solid #09D9E6;
+      }
+      .text {
+        border: none;
+        background-color: blue;
+        color: white;
+        font-family: verdana;
+      }
+      .textClickable {
+        border: none;
+        background-color: darkblue;
+        color: white;
+        cursor: pointer;
+        font-family: verdana;
+      }
+      .textClickable:hover {
+        background-color: royalblue;
+      }
+      .dropdownOptions {
+        border: none;
+        background-color: grey;
+        color: black;
+        cursor: pointer;
+        font-family: verdana;
+      }
+      .dropdownOptions:hover {
+        background-color: darkgrey;
+      }
+      .setInput{
+        background-color: Transparent;
+        border: none;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+    var SolarSystem = [];
+    var Astroids = [];
+    var TextureArray = [];
+    var Assets = [];
+    var universe = {
+      size:5586000000
+    }
+    // (N,R,D,SR,SO)
+    // (Name,Radius in miles, distince in miles from the sun, speed of planets rotation(how many per earth day),speed of planets orbit (how earth years)) per unit / how many
+    // var Sun = new Planet("Sun",432169,0,.87,0);
+    // var Earth = new Planet("Earth",3959,92960000,1,1);
+    // var Moon = new Planet("Moon",1079,93198900,1/3.3,365/27);
+    // var Mars = new Planet("Mars",2100,141600000,.9756,.531295);
+    var Sun, Mercury, Venus, Earth, Moon, Mars, Jupiter, Saturn, Uranus, Neptune;
+    //  (speed, height, sensitivity, viewDistince)
+    var Player = new player(50,174,3,universe.size);
+    var tempArr = [];
+    var StarTexture, gameSound;
+    var fr, didtince, timeScaler, speedVar = 1;
+    var Pause = false;
+    var StopRotation = false;
+    var Pan = false;
+    var DRAWGRID = false;
+    var textureScrollAmount = 3;//the number it shows plus the 4 below it. So the highest it could be is the array limit and the lowest is 3.
+    var orbitScrollAmount = 3;
+    var scrollSize = 4;//how many dropdown items are shown
+    var DragX = 63;
+    var DragY = 626;
+    var preDragX = 0;
+    var preDragY = 0;
+    var accelerationX = 0;
+    var accelerationY = 0;
+    var SButton;
+    var MainSetting;
+    var settingX;
+    var SolarSetting;
+    var PlanetSetting;
+    var Create;
+    var UPNUM = 0;
+    var sliderArr = [];
+    var astroid;
+    var planetNUM;
+    var slider;
+    var untravel;
+    var cList = [-1,-1];
+    var selected = "blue"
+    var keyMAP = {}; // You could also use an array
+    var AAA = 1000;
+
+    function preload() {
+      var trueSelect = false;
+      var select;
+      while (!trueSelect) {
+        select = prompt("H or h for high resolution \nL or l for low resolution", "L");
+        if (select === 'H' || select === 'h' || select === 'L' || select === 'l') {
+          trueSelect = true;
+        }
+        planetNUM = prompt("How many planets do you want?",9);
+        astroid = prompt("How many astroids do you want?",0);
+      }
+      if (select === 'H' || select === 'h') {
+        loadHighRes();
+      }else if (select === 'L' || select === 'l') {
+        loadLowRes();
+      }
+
+      loadAssets();
+      /*Audio*/
+      // gameSound = loadSound('http://localhost:8080/p5_work/Audio/Malachite_Cu2.wav');
+    }
+    function loadHighRes(){
+      /*High Res 65mb*/
+      new Texture("Star",'../Textures/High/Sky.png', TextureArray);
+      new Texture("Sun",'../Textures/High/Sun.png', TextureArray);
+      new Texture("Mercury",'../Textures/High/Mercury.png', TextureArray);
+      new Texture("Venus",'../Textures/High/Venus.png', TextureArray);
+      new Texture("Earth",'../Textures/High/EarthDay.png', TextureArray);
+      new Texture("Moon",'../Textures/High/Moon.png', TextureArray);
+      new Texture("Mars",'../Textures/High/Mars.png', TextureArray);
+      new Texture("Jupiter",'../Textures/High/Jupiter.png', TextureArray);
+      new Texture("Saturn",'../Textures/High/Saturn.png', TextureArray);
+      new Texture("Uranus",'../Textures/High/Uranus.png', TextureArray);
+      new Texture("Neptune",'../Textures/High/Neptune.png', TextureArray);
+      new Texture("Astroid1",'../Textures/High/Astroid1.png', TextureArray);
+      new Texture("Astroid2",'../Textures/High/Astroid2.png', TextureArray);
+      new Texture("Astroid3",'../Textures/High/Astroid3.png', TextureArray);
+      new Texture("Astroid4",'../Textures/High/Astroid4.png', TextureArray);
+    }
+    function loadLowRes(){
+      /*Low Res 6mb*/
+      new Texture("Star",'../Textures/Low/Sky.jpg', TextureArray);
+      new Texture("Sun",'../Textures/Low/Sun.jpg', TextureArray);
+      new Texture("Mercury",'../Textures/Low/Mercury.jpg', TextureArray);
+      new Texture("Venus",'../Textures/Low/Venus.jpg', TextureArray);
+      new Texture("Earth",'../Textures/Low/EarthDay.jpg', TextureArray);
+      new Texture("Moon",'../Textures/Low/Moon.jpg', TextureArray);
+      new Texture("Mars",'../Textures/Low/Mars.jpg', TextureArray);
+      new Texture("Jupiter",'../Textures/Low/Jupiter.jpg', TextureArray);
+      new Texture("Saturn",'../Textures/Low/Saturn.jpg', TextureArray);
+      new Texture("Uranus",'../Textures/Low/Uranus.jpg', TextureArray);
+      new Texture("Neptune",'../Textures/Low/Neptune.jpg', TextureArray);
+      new Texture("Astroid1",'../Textures/Low/Astroid1.jpg', TextureArray);
+      new Texture("Astroid2",'../Textures/Low/Astroid2.jpg', TextureArray);
+      new Texture("Astroid3",'../Textures/Low/Astroid3.jpg', TextureArray);
+      new Texture("Astroid4",'../Textures/Low/Astroid4.jpg', TextureArray);
+    }
+    function loadAssets(){
+      new Texture("Defult",'../UI-Textures/defult.jpg', Assets);
+      new Texture("Earth",'../UI-Textures/Earth.jpg', Assets);
+      new Texture("EarthNight",'../UI-Textures/EarthNight.jpg', Assets);
+      new Texture("Jupiter",'../UI-Textures/Jupiter.jpg', Assets);
+      new Texture("Mars",'../UI-Textures/Mars.jpg', Assets);
+      new Texture("Mercury",'../UI-Textures/Mercury.jpg', Assets);
+      new Texture("Moon",'../UI-Textures/Moon.jpg', Assets);
+      new Texture("Neptune",'../UI-Textures/Neptune.jpg', Assets);
+      new Texture("Saturn",'../UI-Textures/Saturn.jpg', Assets);
+      new Texture("Sky",'../UI-Textures/Sky.jpg', Assets);
+      new Texture("Sun",'../UI-Textures/Sun.jpg', Assets);
+      new Texture("Uranus",'../UI-Textures/Uranus.jpg', Assets);
+      new Texture("Venus",'../UI-Textures/Venus.jpg', Assets);
+    }
+    function Texture(name, url, saveArray){
+      this.name = name;
+      this.URL = url;
+      this.image = loadImage(url);
+      saveArray.push(this);
+    }
+    function getTextureIndex(name){
+      var index = -1;
+      for (var i = 0; i < TextureArray.length; i++) {
+        if(name === TextureArray[i].name){
+          index = i;
+          break;
+        }
+      }
+      return index;
+    }
+    function getAssetsIndex(name){
+      var index = -1;
+      for (var i = 0; i < Assets.length; i++) {
+        if(name === Assets[i].name){
+          index = i;
+          break;
+        }
+      }
+      return index;
+    }
+
+    function setup() {
+      // createCanvas(displayWidth, displayHeight-4,WEBGL);
+      createCanvas(1500,900,WEBGL);
+      setAttributes('antialias', true);
+      camera(0, 0, 1, 0, 0, 0, 0, 1, 0);
+      perspective(PI/3.0, width/height, ((height/2.0) / tan(PI*60.0/360.0))/100.0,  ((height/2.0) / tan(PI*60.0/360.0))*Player.viewDistince);
+      // ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 10000000000000);
+      angleMode(RADIANS);
+      if (planetNUM - 1 >= 0) {
+        Sun = new Planet("Sun",1000,0,.87,0,0,0,0,1,"Sun");
+      }if (planetNUM - 2 >= 0) {
+        Mercury = new Planet("Mercury",200,4500,.5,1.2,0,0,0,2,"Mercury");
+      }if (planetNUM - 3 >= 0) {
+        Venus = new Planet("Venus",350,8500,2,.7,0,0,0,3,"Venus");
+      }if (planetNUM - 4 >= 0) {
+        Earth = new Planet("Earth",400,16000,1,1,0,0,0,4,"Earth");
+      }if (planetNUM - 5 >= 0) {
+        Moon = new Planet("Moon",200,2800,1/3.3,365/27,0,3,0,5,"Moon");
+      }if (planetNUM - 6 >= 0) {
+        Mars = new Planet("Mars",300,20000,.9756,.531295,0,0,0,6,"Mars");
+      }if (planetNUM - 7 >= 0) {
+        Jupiter = new Planet("Jupiter",800,28000,.3,.4,0,0,0,7,"Jupiter");
+      }if (planetNUM - 8 >= 0) {
+        Saturn = new Planet("Saturn",600,36000,1.4,1.234,0,0,0,8,"Saturn");
+      }if (planetNUM - 9 >= 0) {
+        Uranus = new Planet("Uranus",400,44000,1, 1.1,0,0,0,9,"Uranus");
+      }if (planetNUM - 10 >= 0) {
+        Neptune = new Planet("Neptune",300,48000,1,.91,0,0,0,10,"Neptune");
+      }
+      settingX = width-width/7;
+      new solarsystem("Solar System",0,0,0);
+      for (var i = 1; i < 0; i++) {
+        x = 10000*i;
+        new Planet("Sun"+i,1000,0,.87,0,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Mercury"+i,200,4500,.5,1.2,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Venus"+i,350,8500,2,.7,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Earth"+i,400,16000,1,1,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Moon"+i,200,2800,1/3.3,365/27,0,3,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Mars"+i,300,20000,.9756,.531295,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Jupiter"+i,800,28000,.3,.4,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Saturn"+i,600,36000,1.4,1.234,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Uranus"+i,400,44000,1, 1.1,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Neptune"+i,700,50000,1.2, 2.1,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new Planet("Welch"+i,900,78000,.5, 1.2,0,0,0,int(random(TextureArray.length)),random(Assets).name);
+        new solarsystem("Solar System"+i,x,x,0);
+      }
+      drawButtons();
+      MainSetting = new drawMainSetting();
+      SolarSetting = new drawSolarSetting();
+      PlanetSetting = new drawPlanetSetting();
+      CreatePlanet = new drawCreatePlanet();
+      createAstroid(astroid,24000,0,0);
+      // gameSound.loop();
+    }
+    function draw() {
+      if(!Pause){
+        updateVarables();
+        background(0);
+        if(Player.isFollowing){
+          if (Pan) {
+            Player.x=SolarSystem[Player.followPlanet[0]].planets[Player.followPlanet[1]].x;
+            Player.y=SolarSystem[Player.followPlanet[0]].planets[Player.followPlanet[1]].y;
+            Player.z=SolarSystem[Player.followPlanet[0]].planets[Player.followPlanet[1]].z;
+          }else {
+            Player.follow();
+          }
+        }
+        translate(-Player.x, -Player.y, -Player.z);
+        drawGrid();
+        drawSystem();
+        fr.setText("FPS: "+str( ceil(frameRate()) ) );
+        if(MainSetting.isShown){
+          MainSetting.show();
+          SolarSetting.hide();
+          PlanetSetting.hide();
+          CreatePlanet.hide();
+        } else if (SolarSetting.isShown) {
+          MainSetting.hide();
+          SolarSetting.show(cList[0]);
+          PlanetSetting.hide();
+          CreatePlanet.hide();
+        } else if (PlanetSetting.isShown) {
+          MainSetting.hide();
+          SolarSetting.hide();
+          PlanetSetting.show(cList[0],cList[1]);
+          CreatePlanet.hide();
+        } else if(CreatePlanet.isShown){
+          MainSetting.hide();
+          SolarSetting.hide();
+          PlanetSetting.hide();
+          CreatePlanet.show(cList[0]);
+          push();
+          translate(CreatePlanet.x, CreatePlanet.y, 0);
+          rotateX(-PI/2);
+          texture(TextureArray[CreatePlanet.textureDropdown.getIndex()].image);
+          sphere(CreatePlanet.sizeInput.input.value());
+          pop();
+        } else {
+          MainSetting.hide();
+          SolarSetting.hide();
+          PlanetSetting.hide();
+          CreatePlanet.hide();
+        }
+      }
+    }
+
+    function updateVarables(){
+      if(Player.isFollowing){
+        accelerationX = SolarSystem[Player.followPlanet[0]].planets[Player.followPlanet[1]].Sspeed * 5.968310365945/speedVar;
+      }
+      DragX += accelerationX/5;
+      DragY += accelerationY/5;
+      accelerationX/=1.6;
+      accelerationY/=1.5;
+      if (DragX > 1080 || DragX < -1080) {
+        DragX%=1080;
+      }
+
+      X = -((DragY+height/4)/Player.sensitivity)*(PI/180);
+      Z = -((DragX+width/6)/Player.sensitivity)*(PI/180);
+      rotateX(X);
+      rotateZ(Z);
+      if(!Player.isFollowing){
+        keyEvent(Z);
+      }else{
+        followMovement();
+      }
+      if(keyCode == 13){ //enter key
+        for (var i = 0; i < sliderArr.length; i++) {
+          if (sliderArr[i].NUMBERINPUT) {
+            value = sliderArr[i].numberInput.value();
+            if(value != "" && value != '-'){
+              sliderArr[i].updateNumber(value);
+            }
+            sliderArr[i].numberInput.value("");
+            sliderArr[i].NUMBERINPUT = false;
+            break;
+          }
+        }
+        keyCode = null;
+      }
+      preDragX = mouseX;
+      preDragY = mouseY;
+      speedVar = sq(sq(timeScaler.slider.value()));
+      if (!sliderArr[0].NUMBERINPUT) {
+        timeScaler.number.elt.textContent = timeScaler.slider.value();
+      }
+      if(!StopRotation){
+        if (PlanetSetting.isShown) {
+          SolarSystem[cList[0]].planets[cList[1]].revolution = PlanetSetting.RevolutionSlider.slider.value();
+        }
+        for (var i = 0; i < SolarSystem.length; i++) {
+          SolarSystem[i].update();
+        }
+        for (var i = 0; i < Astroids.length; i++) {
+          Astroids[i].update();
+        }
+        if (PlanetSetting.isShown) {
+          temp = PlanetSetting.RevolutionSlider.number.elt.textContent;
+          PlanetSetting.RevolutionSlider.updateNumber(SolarSystem[cList[0]].planets[cList[1]].revolution);
+          PlanetSetting.RevolutionSlider.number.elt.textContent = temp;
+        }
+        UPNUM++;
+        if(UPNUM>10){
+          if (PlanetSetting.isShown && !PlanetSetting.RevolutionSlider.NUMBERINPUT) {
+            PlanetSetting.RevolutionSlider.updateNumber(SolarSystem[cList[0]].planets[cList[1]].revolution);
+          }
+          UPNUM %= 10;
+        }
+      }
+      if(CreatePlanet.isShown){
+        CreatePlanet.RevolutionSlider.updateNumber(CreatePlanet.RevolutionSlider.slider.value());
+        CreatePlanet.x = cos(CreatePlanet.RevolutionSlider.slider.value())*CreatePlanet.distinceInput.input.value() + SolarSystem[CreatePlanet.currentList].planets[CreatePlanet.orbitDropdown.getIndex()].x;
+        CreatePlanet.y = sin(CreatePlanet.RevolutionSlider.slider.value())*CreatePlanet.distinceInput.input.value() + SolarSystem[CreatePlanet.currentList].planets[CreatePlanet.orbitDropdown.getIndex()].y;
+      }
+
+    }
+    function drawGrid(){
+        push();
+          fill(255);
+          translate(-75,0);
+          box(150,10,10);
+          fill('red');
+          translate(150,0);
+          box(150,10,10);
+        pop();
+        push();
+          fill('green');
+          translate(0,-75);
+          box(10,150,10);
+          fill(255);
+          translate(0,150);
+          box(10,150,10);
+        pop();
+        push();
+          fill(255);
+          translate(0,0,-75);
+          box(10,10,150);
+          fill('blue');
+          translate(0,0,150);
+          box(10,10,150);
+        pop();
+        if(DRAWGRID){
+          shortest = [sqrt( sq(SolarSystem[0].x-Player.x) + sq(SolarSystem[0].y-Player.y) + sq(SolarSystem[0].z-Player.z) ),0];
+          for (var i = 1; i < SolarSystem.length; i++) {
+            D = sqrt( sq(SolarSystem[i].x-Player.x) + sq(SolarSystem[i].y-Player.y) + sq(SolarSystem[i].z-Player.z) );
+            if (D < shortest[0]){
+              shortest = [D,i];
+            }
+          }
+          i = shortest[1];
+          for (var j = 0; j < SolarSystem[i].planets.length; j++) {
+            x = SolarSystem[i].planets[SolarSystem[i].planets[j].Orbit].x + SolarSystem[i].x;
+            y = SolarSystem[i].planets[SolarSystem[i].planets[j].Orbit].y + SolarSystem[i].y;
+            z = SolarSystem[i].planets[SolarSystem[i].planets[j].Orbit].z + SolarSystem[i].z;
+            d = SolarSystem[i].planets[j].distince;
+            r = SolarSystem[i].planets[j].revolution;
+            drawOrbit(x,y,z,d,r,i,j);
+          }
+        }else if(PlanetSetting.isShown){
+          i =  PlanetSetting.currentList[0];
+          j =  PlanetSetting.currentList[1];
+          if(i != -1){
+            x = SolarSystem[i].planets[SolarSystem[i].planets[j].Orbit].x;
+            y = SolarSystem[i].planets[SolarSystem[i].planets[j].Orbit].y;
+            z = SolarSystem[i].planets[SolarSystem[i].planets[j].Orbit].z;
+            d = SolarSystem[i].planets[j].distince;
+            r = SolarSystem[i].planets[j].revolution;
+            drawOrbit(x,y,z,d,r,i,j);
+          }
+        }else if (CreatePlanet.isShown) {
+          i = CreatePlanet.currentList;
+          j = CreatePlanet.orbitDropdown.getIndex();
+          x = SolarSystem[i].planets[j].x;
+          y = SolarSystem[i].planets[j].y;
+          z = SolarSystem[i].planets[j].z;
+          d = CreatePlanet.distinceInput.input.value();
+          r = CreatePlanet.RevolutionSlider.slider.value();
+          drawOrbit(x,y,z,d,r,i,j);
+        }
+    }
+    function drawSystem(){
+      texture(TextureArray[getTextureIndex("Star")].image);
+      push();
+        rotateX(-PI/2);
+        sphere(universe.size);
+      pop();
+      if(Pan) {
+        push();
+          translate(Player.x,Player.y,Player.z);
+          fill('red');
+          box(10,10,10);
+        pop();
+      }
+      for (var i = 0; i < SolarSystem.length; i++) {
+        SolarSystem[i].draw();
+      }
+      for (var i = 0; i < Astroids.length; i++) {
+        Astroids[i].draw();
+      }
+    }
+    onkeydown = onkeyup = function(e){
+        e = e || event; // to deal with IE
+        keyMAP[e.keyCode] = e.type == 'keydown';
+        /* insert conditional here */
+    }
+    function keyEvent(Z){
+      temp = Player.speed;
+      if(Pan) {
+        Player.speed = (Player.panHeight/50) + 50;
+      }
+      if (keyMAP[16]){//shift
+        Player.speed*=3;
+      }
+      if(keyMAP[87]){//w
+        Player.x -= Math.sin(Z) * Player.speed;
+        Player.y -= Math.cos(Z) * Player.speed;
+      }if(keyMAP[83]){//s
+        Player.x += Math.sin(Z) * Player.speed;
+        Player.y += Math.cos(Z) * Player.speed;
+      }if(keyMAP[65]){//a
+        Player.x -= Math.sin(Z + PI/2) *Player.speed;
+        Player.y -= Math.cos(Z + PI/2) *Player.speed;
+      }if(keyMAP[68]){//d
+        Player.x -= Math.sin(Z - PI/2) *Player.speed;
+        Player.y -= Math.cos(Z - PI/2) *Player.speed;
+      }if(keyMAP[81]){//q
+        Player.z -=Player.speed;
+      }if(keyMAP[69]){//e
+        Player.z +=Player.speed;
+      }if(keyIsDown(UP_ARROW)){
+        Player.z +=Player.speed;
+      }if(keyIsDown(DOWN_ARROW)){
+        Player.z -=Player.speed;
+      }
+      Player.speed = temp;
+    }
+    function mouseDragged() {
+      if(mouseX < width && mouseY < height && (mouseY > 53 || mouseX > 400)){
+        accelerationX += mouseX - preDragX;
+        accelerationY += mouseY - preDragY;
+        if((PlanetSetting.isShown || CreatePlanet.isShown) && (mouseX < settingX || mouseY > 580)){
+          DragX += mouseX - preDragX;
+          DragY += mouseY - preDragY;
+        }else if(!PlanetSetting.isShown && !CreatePlanet.isShown){
+          DragX += mouseX - preDragX;
+          DragY += mouseY - preDragY;
+        }
+      }
+    }
+    function mouseWheel(event) {
+      var unit = event.delta/abs(event.delta);
+
+      if (PlanetSetting.isShown || CreatePlanet.isShown) {
+        textureScrollAmount += unit;
+        if(textureScrollAmount < scrollSize-1){
+          textureScrollAmount = scrollSize-1;
+        }else if (textureScrollAmount > TextureArray.length-1) {
+          textureScrollAmount = TextureArray.length-1;
+        }
+
+        orbitScrollAmount += unit;
+        if(orbitScrollAmount < scrollSize-1){
+          orbitScrollAmount = scrollSize-1;
+        }else if (orbitScrollAmount > SolarSystem[PlanetSetting.currentList[0]].planets.length-1) {
+          orbitScrollAmount = SolarSystem[PlanetSetting.currentList[0]].planets.length-1;
+        }
+      }
+
+      var gotOne = false;
+
+      if(PlanetSetting.isShown){
+        if (PlanetSetting.textureDropdown.ShowList) {
+          x = PlanetSetting.textureDropdown.x;
+          y = PlanetSetting.textureDropdown.y;
+          w = PlanetSetting.textureDropdown.w;
+          h = PlanetSetting.textureDropdown.h;
+          if(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+(2*h)  &&  mouseY < y+((2+scrollSize)*h)){
+            PlanetSetting.textureDropdown.redraw();
+            gotOne = true;
+          }
+        }
+
+        if (PlanetSetting.orbitDropdown.ShowList) {
+          x = PlanetSetting.orbitDropdown.x;
+          y = PlanetSetting.orbitDropdown.y;
+          w = PlanetSetting.orbitDropdown.w;
+          h = PlanetSetting.orbitDropdown.h;
+          if(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+(2*h)  &&  mouseY < y+((2+scrollSize)*h)){
+            PlanetSetting.orbitDropdown.redraw();
+            gotOne = true;
+          }
+        }
+        if (!gotOne) {
+          Player.height += (100*unit)*(Player.distinceToSurface()/750);
+        }
+      }else if (CreatePlanet.isShown) {
+        if(!CreatePlanet.orbitDropdown.ShowList && !CreatePlanet.textureDropdown.ShowList){
+          Player.height += (100*unit)*(Player.distinceToSurface()/750);
+        }else if (!CreatePlanet.orbitDropdown.ShowList && CreatePlanet.textureDropdown.ShowList) {
+          CreatePlanet.textureDropdown.redraw();
+        }else if (CreatePlanet.orbitDropdown.ShowList && !CreatePlanet.textureDropdown.ShowList) {
+          CreatePlanet.orbitDropdown.redraw();
+        }else {
+          CreatePlanet.textureDropdown.redraw();
+          CreatePlanet.orbitDropdown.redraw();
+        }
+      }
+      if(Pan && !gotOne) {
+        Player.panHeight += (unit*Player.panHeight) / 3;
+        camera(0, Player.panHeight, Player.panHeight, 0, 0, 0, 0, 1, 0);
+      }else {
+        Player.height += (100*unit)*(Player.distinceToSurface()/750);
+      }
+    }
+    function mouseReleased() {
+      if (PlanetSetting.textureDropdown.ShowList) {
+        x = PlanetSetting.textureDropdown.x;
+        y = PlanetSetting.textureDropdown.y;
+        w = PlanetSetting.textureDropdown.w;
+        h = PlanetSetting.textureDropdown.h;
+        if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
+          for (var i = 0; i < PlanetSetting.textureDropdown.subButton.length; i++) {
+            PlanetSetting.textureDropdown.subButton[i].hide();
+          }
+          PlanetSetting.textureDropdown.ShowList = false;
+        }
+      }
+      if (PlanetSetting.orbitDropdown.ShowList) {
+        x = PlanetSetting.orbitDropdown.x;
+        y = PlanetSetting.orbitDropdown.y;
+        w = PlanetSetting.orbitDropdown.w;
+        h = PlanetSetting.orbitDropdown.h;
+        if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
+          for (var i = 0; i < PlanetSetting.orbitDropdown.subButton.length; i++) {
+            PlanetSetting.orbitDropdown.subButton[i].hide();
+          }
+          PlanetSetting.orbitDropdown.ShowList = false;
+        }
+      }
+    }
+    function followMovement(){
+      if(key=='w'){
+        Player.latitude -=.01;
+      }else if(key=='s'){
+        Player.latitude +=.01;
+      }else if(key=='a'){
+        Player.longitude +=.01;
+      }else if(key=='d'){
+        Player.longitude -=.01;
+      }
+    }
+    function drawOrbit(x,y,z,d,r,sIndex,pIndex){
+      noFill();
+      //draws orbit
+      strokeWeight(25);
+      var q = 0;
+      for (var i = TWO_PI; i >= 0; i-=.1) {
+        q++;
+        a = cos(i+r)*d + x;
+        b = sin(i+r)*d + y;
+        c = sin(i+r)*SolarSystem[sIndex].planets[pIndex].zScale + z;
+        if(q===1){
+          beginShape(POINTS);
+        }
+        stroke(126-(q*2));
+        vertex(a, b, c);
+        if(q%2===0){
+          endShape();
+          beginShape(POINTS);
+          vertex(a, b, c);
+        }
+      }
+      //draws line to center of orbit.
+      // strokeWeight(25);
+      // stroke(color('yellow'));
+      // beginShape(POINTS);
+      // vertex(x, y, z);
+      // a = Planets[o].x;
+      // b = Planets[o].y;
+      // c = Planets[o].z;
+      // vertex(a, b, c);
+      // endShape();
+      fill(0);
+      // console.log(x+", "+y+","+d);
+    }
+    function drawRings(x,y,d){
+      stroke(color('yellow'));
+      var preX = cos(0)*d + x;
+      var preY = sin(0)*d + y;
+      for (var i = 0; i < 360; i++) {
+        a = cos(i)*d + x;
+        b = sin(i)*d + y;
+        line( preX, preY, 0, a, b, 0);
+        preX = a;
+        preY = b;
+      }
+    }
+
+    function player(speed, height, sensitivity, viewDistince) {
+      this.speed = speed;
+      this.height = height;
+      this.panHeight = 200;
+      this.sensitivity = sensitivity;
+      this.viewDistince = viewDistince;
+      this.followPlanet = [-1,-1];
+      this.isFollowing = false;
+      this.x = -3600;
+      this.y = -3600;
+      this.z = 2000;
+      this.latitude = 1.57;
+      this.longitude = 0;
+      this.follow = function(){
+        pln = SolarSystem[Player.followPlanet[0]].planets[Player.followPlanet[1]];
+        this.x = pln.x + (pln.size+Player.height) * cos(this.latitude) * cos(this.longitude);
+        this.y = pln.y + (pln.size+Player.height) * cos(this.latitude) * sin(this.longitude);
+        this.z = pln.z + (pln.size+Player.height) * sin(this.latitude);
+      }
+
+      this.distinceToSurface = function(){
+        if(this.isFollowing){
+          pln = SolarSystem[this.followPlanet[0]].planets[this.followPlanet[1]];
+          value = sqrt(sq((this.x)-(pln.x)) + sq((this.y)-(pln.y)) + sq((this.z)-(pln.z))) - pln.size;
+          return value;
+        }else {
+          return null;
+        }
+      }
+    }
+    function Planet(name, size, distince, Sspeed, Ospeed,r,o,s, textureIndex, UIName) {
+      this.name = name;
+      this.textureIndex = textureIndex; // the index used in the TextureArray array
+      this.UIName = UIName;
+      this.size = size;
+      this.distince = distince;
+      this.x = 0;
+      this.y = 0;
+      this.z = 0;
+      this.spin = 0;
+      this.Sspeed = Sspeed;
+      this.Orbit = o;
+      this.solarIndex = s
+      this.Ospeed = Ospeed;
+      this.revolution = r;
+      this.zScale = 0;
+      tempArr.push(this);
+      this.update = function(){
+        this.x = cos(this.revolution)*this.distince + SolarSystem[this.solarIndex].planets[this.Orbit].x;
+        this.y = sin(this.revolution)*this.distince + SolarSystem[this.solarIndex].planets[this.Orbit].y;
+        this.z = sin(this.revolution)*this.zScale + SolarSystem[this.solarIndex].planets[this.Orbit].z;
+        this.revolution += (this.Ospeed/(this.distince+.001))/speedVar; // 1 earth year = 6 sec // 10min
+        if(this.revolution>TWO_PI){
+          this.revolution%=TWO_PI;
+        }
+        this.spin-=(this.Sspeed/144)/speedVar; // 1 earth day = 15 seconds
+        if (this.spin>TWO_PI || this.spin<-TWO_PI) {
+          this.spin%=TWO_PI;
+        }
+      }
+      this.draw = function(){
+        push();
+          translate(this.x, this.y, this.z);
+          rotateX(-PI/2);
+          rotateY(this.spin);
+          ind = this.textureIndex;
+          texture(TextureArray[ind].image);
+          sphere(this.size,24*4,16*4);
+        pop();
+      }
+    }
+    function Astroid(size, distince, Sspeed, Ospeed,r,o,s, textureIndex) {
+      this.textureIndex = textureIndex; // the index used in the TextureArray array
+      this.size = size;
+      this.distince = distince;
+      this.x = 0;
+      this.y = 0;
+      this.z = 0;
+      this.spin = 0;
+      this.Sspeed = Sspeed;
+      this.Orbit = o;
+      this.solarIndex = s;
+      this.Ospeed = Ospeed;
+      this.revolution = r;
+      Astroids.push(this);
+      this.update = function(){
+        this.x = cos(this.revolution)*this.distince + SolarSystem[this.solarIndex].planet[this.Orbit].x;
+        this.y = sin(this.revolution)*this.distince + SolarSystem[this.solarIndex].planet[this.Orbit].y;
+        this.revolution += (this.Ospeed/this.distince)/speedVar; // 1 earth year = 6 sec // 10min
+        if(this.revolution>TWO_PI){
+          this.revolution%=TWO_PI;
+        }
+        this.spin-=(this.Sspeed/144)/speedVar; // 1 earth day = 15 seconds
+        if (this.spin>TWO_PI || this.spin<-TWO_PI) {
+          this.spin%=TWO_PI;
+        }
+      }
+      this.draw = function(){
+        push();
+          translate(this.x, this.y, this.z);
+          rotateX(-PI/2);
+          rotateY(this.spin);
+          texture(TextureArray[this.textureIndex].image);
+          sphere(this.size,24*4,16*4);
+        pop();
+      }
+    }
+    function solarsystem(name, x, y, z) {
+      this.name = name;
+      this.UIName = "Defult"
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.planets = tempArr;
+      tempArr = [];
+      SolarSystem.push(this);
+      for (var i = 0; i < this.planets.length; i++) {
+        // this.planets[i].update();
+        // this.planets[i].textureIndex = getTextureIndex(this.planets[i].name);
+      }
+      this.update = function() {
+        for(var i = 0; i < this.planets.length; i++){
+          // this.planets[i].revolution = this.planets[i].MainButton.sub.RevolutionSlider.slider.value();
+          this.planets[i].update();
+          this.planets[i].zScale = 0;//slider.value();
+          // this.planets[i].MainButton.sub.RevolutionSlider.slider.value(this.planets[i].revolution);
+        }
+      }
+
+      this.draw = function() {
+        push();
+        translate(this.x,this.y,this.z);
+          for(var i = 0; i < this.planets.length; i++){
+            this.planets[i].draw();
+          }
+        pop();
+      }
+
+      this.add = function(planet) {
+        this.planets.push(planet);
+      }
+    }
+    function randSolar(num, x, y, z) {
+      for (var i = 1; i <= num; i++) {
+        new Planet("Rand"+i, size, distince, Sspeed, Ospeed,r,o, textureIndex);
+      }
+    }
+
+    function drawButtons(){
+      /*
+      button.attribute('disabled', ''); //disables the buttons
+      button.removeAttribute('disabled'); //reinables the buttons
+      */
+      //creats the UI
+      // slider = createSlider(-10000,10000,0);
+      fr = new Text("FPS:",0,0,100,48);
+      SButton = createButton("Setting");
+      SButton.class("button");
+      SButton.position(width-SButton.width-10,5);
+      SButton.mouseReleased(function(){ if(MainSetting.isShown){MainSetting.isShown = false; SButton.elt.style.backgroundColor= "#4CAF50";}else{MainSetting.isShown = true; SButton.elt.style.backgroundColor=selected;} });
+      GButton = createButton("Grid");
+      GButton.class("button");
+      GButton.position(SButton.x-GButton.width-10,5);
+      GButton.mouseReleased(function(){if(DRAWGRID){DRAWGRID = false; GButton.elt.style.backgroundColor= "#4CAF50";}else{DRAWGRID = true; GButton.elt.style.backgroundColor=selected}});
+      timeScaler = new Slider("Time Scaler",0.001,3,1,.001,100,0,129,16);
+      var a = createButton("Pause");
+      a.class("button");
+      a.position(timeScaler.w+timeScaler.x+5,0);
+      a.size(110,a.height);
+      a.mouseReleased(function(){
+        if(Pause){
+          Pause=false;
+          a.style('background-color', null);
+        }else {
+          Pause = true;
+          a.style('background-color', color(selected));
+        }
+      });
+      var b = createButton("Stop Rotation");
+      b.class("button");
+      b.position(timeScaler.w+timeScaler.x+5,21);
+      b.size(110,a.height);
+      b.mouseReleased(function(){
+        if(StopRotation){
+          StopRotation=false;
+          b.style('background-color', null);
+        }else {
+          StopRotation = true;
+          b.style('background-color', color(selected));
+        }
+      });
+      var c = createButton("Pan");
+      c.class("button");
+      c.position(a.width+a.x+5,0);
+      c.size(50,a.height);
+      c.mouseReleased(function(){
+        if(Pan){
+          DragY -= 130
+          Pan=false;
+          camera(0, 0, 1, 0, 0, 0, 0, 1, 0);
+          c.style('background-color', null);
+        }else {
+          Pan = true;
+          DragY += 130
+          camera(0, Player.panHeight, Player.panHeight, 0, 0, 0, 0, 1, 0);
+          c.style('background-color', color(selected));
+        }
+      });
+      untravel = createButton("Travel");
+      untravel.class("text");
+      untravel.position(a.width+a.x+5,a.height);
+      untravel.size(50,a.height);
+      untravel.style('background-color', "grey");
+      untravel.attribute('disabled', '');
+      untravel.mouseReleased(function(){
+        PlanetSetting.travelTo.style('background-color', null);
+        untravel.attribute('disabled', '');
+        untravel.style('background-color', "grey");
+        untravel.class("text");
+        Player.isFollowing = false;
+      });
+
+    }
+    function screen(imageURL){
+      this.image = createButton("");
+      this.image.position(0,0);
+      this.image.size(width,height);
+      this.image.style("background: url("+imageURL+")");
+      this.image.style("boreder: none");
+      this.image.attribute('disabled', '');
+
+      this.setImage = function(newImage){
+        this.image.style("background: "+newImage);
+      }
+
+      this.hide = function(){
+        this.image.hide();
+      }
+
+      this.show = function(){
+        this.image.show();
+      }
+    }
+    function Text(name, x, y, w, h){
+      this.name = name;
+      this.text = createButton(name);
+      this.text.class('text');
+      this.text.position(x,y);
+      this.text.size(w,h);
+      this.text.attribute('disabled', '');
+      this.setText = function(newName){
+        this.text.elt.textContent = newName;
+      }
+      this.class = function(c){
+        this.text.class(c);
+      }
+      this.hide = function(){
+        this.text.hide();
+      }
+      this.show = function(){
+        this.text.show();
+      }
+    }
+    function ItemInfo(name, start, x, y, w, h){
+      this.head = new Text(name,x,y,w,h);
+      this.info = new Text(start,x,y+h,w,h);
+
+      this.update = function(newText){
+        this.info.setText(newText);
+      }
+
+      this.hide = function(){
+        this.head.hide();
+        this.info.hide();
+      }
+      this.show = function(){
+        this.head.show();
+        this.info.show();
+      }
+    }
+    function Input(name,x,y,w,h,input,stepSize){
+      this.text = new Text(name,x,y,w+4,h);
+      this.input = createInput(0,input);
+      this.input.elt.step = stepSize;
+      this.input.position(x,y+h);
+      this.input.size(w,h);
+
+      this.show = function(){
+        this.input.show();
+        this.text.show();
+      }
+      this.hide = function(){
+        this.input.hide();
+        this.text.hide();
+      }
+    }
+    function TextureDropdown(text,startIndex,x,y,w,h,Parent){
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.ShowList = false;
+      this.mainText = new Text(text,x,y,w,h);
+      this.mainText.text.class('text');
+      if(startIndex != -1){
+        this.MainButton = createButton(TextureArray[startIndex].name);
+      }else {
+        this.MainButton = createButton(text);
+      }
+      this.MainButton.position(x,y+h);
+      this.MainButton.size(w,h);
+      this.MainButton.class('textClickable');
+      this.subButton = [];
+      for(var i = 0; i < TextureArray.length; i++){
+        this.subButton.push(createButton(TextureArray[i].name));
+        this.subButton[i].size(w,h);
+        this.subButton[i].class('dropdownOptions');
+        this.subButton[i].hide();
+        this.subButton[i].mouseReleased(function(){
+          Parent.textureDropdown.MainButton.elt.textContent = this.elt.textContent;
+          SolarSystem[Parent.currentList[0]].planets[Parent.currentList[1]].textureIndex = Parent.textureDropdown.getIndex();
+          for (var i = 0; i < Parent.textureDropdown.subButton.length; i++) {
+            Parent.textureDropdown.subButton[i].hide();
+          }
+          Parent.textureDropdown.ShowList = false;
+        });
+      }
+
+      this.MainButton.mouseReleased(function(){
+        if(!Parent.textureDropdown.ShowList){
+          textureScrollAmount = 3;
+          for (var i = 0; i < scrollSize; i++) {
+            Parent.textureDropdown.subButton[i].position(x,y+(i*h)+2*h);
+            Parent.textureDropdown.subButton[i].show();
+          }
+          Parent.textureDropdown.ShowList = true;
+        }else {
+          for (var i = 0; i < Parent.textureDropdown.subButton.length; i++) {
+            Parent.textureDropdown.subButton[i].hide();
+          }
+          Parent.textureDropdown.ShowList = false;
+        }
+      });
+
+      this.redraw = function(){
+        for (var i = 0; i < Parent.textureDropdown.subButton.length; i++) {
+          Parent.textureDropdown.subButton[i].hide();
+        }
+        for (var i = 0; i < scrollSize; i++) {
+          Parent.textureDropdown.subButton[i+textureScrollAmount-(scrollSize-1)].position(x,y+(i*h)+2*h);
+          Parent.textureDropdown.subButton[i+textureScrollAmount-(scrollSize-1)].show();
+        }
+      }
+
+      this.getIndex = function(){
+        index = -1;
+        for (var i = 0; i < TextureArray.length; i++) {
+          if(Parent.textureDropdown.MainButton.elt.textContent === Parent.textureDropdown.subButton[i].elt.textContent){
+            index = i;
+            break;
+          }
+        }
+        return index;
+      }
+
+      this.hide = function(){
+        this.ShowList = false;
+        for (var i = 0; i < this.subButton.length; i++) {
+          this.subButton[i].hide();
+        }
+        this.MainButton.hide();
+        this.mainText.hide();
+      }
+      this.show = function(textureIndex){
+        this.mainText.show();
+        this.MainButton.show();
+        this.MainButton.elt.textContent = TextureArray[textureIndex].name;
+      }
+    }
+    function OrbitDropdown(text,startIndex,x,y,w,h,Parent){
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.ShowList = false;
+      this.mainText = new Text(text,x,y,w,h);
+      this.mainText.text.class('text');
+      if(startIndex != -1){
+        this.MainButton = createButton(text);//Planets[startIndex].name);
+      }else {
+        this.MainButton = createButton(text);
+      }
+      this.MainButton.position(x,y+h);
+      this.MainButton.size(w,h);
+      this.MainButton.class('textClickable');
+      this.MainButton.mouseReleased(function(){
+        if(!Parent.orbitDropdown.ShowList){
+          orbitScrollAmount = 3;
+          for (var i = 0; i < scrollSize; i++) {
+            if(Parent.orbitDropdown.subButton[i].elt.textContent !== ""){
+              Parent.orbitDropdown.subButton[i].position(x,y+(i*h)+2*h);
+              Parent.orbitDropdown.subButton[i].show();
+            }
+          }
+          Parent.orbitDropdown.ShowList = true;
+        }else {
+          for (var i = 0; i < Parent.orbitDropdown.subButton.length; i++) {
+            Parent.orbitDropdown.subButton[i].hide();
+          }
+          Parent.orbitDropdown.ShowList = false;
+        }
+      });
+
+      this.subButton = [];
+      for(var i = 0; i < 20; i++){
+        this.subButton.push(createButton(""));
+        this.subButton[i].size(w,h);
+        this.subButton[i].class('dropdownOptions');
+        this.subButton[i].hide();
+        this.subButton[i].mouseReleased(function(){
+          Parent.orbitDropdown.MainButton.elt.textContent = this.elt.textContent;
+          if(CreatePlanet.isShown){
+            btnInd = CreatePlanet.orbitDropdown.getIndex();
+            pln = SolarSystem[CreatePlanet.currentList].planets[btnInd];
+            CreatePlanet.distinceInput.input.elt.value = sqrt( sq((CreatePlanet.x)-(pln.x)) + sq((CreatePlanet.y)-(pln.y)));
+            x1 = CreatePlanet.x;
+            y1 = CreatePlanet.y;
+            x2 = pln.x;
+            y2 = pln.y;
+            r = CreatePlanet.distinceInput.input.value();
+          }else {
+            btnInd = PlanetSetting.orbitDropdown.getIndex();
+            index = PlanetSetting.currentList;
+            SolarSystem[index[0]].planets[index[1]].Orbit = btnInd;
+            SolarSystem[index[0]].planets[index[1]].distince = sqrt( sq((SolarSystem[index[0]].planets[index[1]].x)-(SolarSystem[index[0]].planets[btnInd].x)) +
+                                                                     sq((SolarSystem[index[0]].planets[index[1]].y)-(SolarSystem[index[0]].planets[btnInd].y)) +
+                                                                     sq((SolarSystem[index[0]].planets[index[1]].z)-(SolarSystem[index[0]].planets[btnInd].z)) );
+            x1 = SolarSystem[index[0]].planets[index[1]].x;
+            y1 = SolarSystem[index[0]].planets[index[1]].y;
+            x2 = SolarSystem[index[0]].planets[btnInd].x;
+            y2 = SolarSystem[index[0]].planets[btnInd].y;
+            r = SolarSystem[index[0]].planets[index[1]].distince;
+          }
+          lenY = sqrt(sq(y1-y2));
+          Q1 = asin(lenY/r);
+          Q2 = PI - Q1;
+          Q3 = PI + Q1;
+          Q4 = TWO_PI - Q1;
+          if(x1-x2>0 && y1-y2>0){
+            Parent.RevolutionSlider.slider.value(Q1);
+            Parent.RevolutionSlider.updateNumber(Q1);
+          }else if (x1-x2<0 && y1-y2>0) {
+            Parent.RevolutionSlider.slider.value(Q2);
+            Parent.RevolutionSlider.updateNumber(Q2);
+          }else if (x1-x2<0 && y1-y2<0) {
+            Parent.RevolutionSlider.slider.value(Q3);
+            Parent.RevolutionSlider.updateNumber(Q3);
+          }else {
+            Parent.RevolutionSlider.slider.value(Q4);
+            Parent.RevolutionSlider.updateNumber(Q4);
+          }
+          if(PlanetSetting.isShown){
+            Parent.distinceInput.input.elt.value = r;
+          }
+
+          for (var i = 0; i < Parent.orbitDropdown.subButton.length; i++) {
+            Parent.orbitDropdown.subButton[i].hide();
+          }
+          Parent.orbitDropdown.ShowList = false;
+        });
+      }
+
+      this.redraw = function(){
+        for (var i = 0; i < Parent.orbitDropdown.subButton.length; i++) {
+          Parent.orbitDropdown.subButton[i].hide();
+        }
+        for (var i = 0; i < scrollSize; i++) {
+          if(Parent.orbitDropdown.subButton[i+orbitScrollAmount-(scrollSize-1)].elt.textContent !== ""){
+            Parent.orbitDropdown.subButton[i+orbitScrollAmount-(scrollSize-1)].position(x,y+(i*h)+2*h);
+            Parent.orbitDropdown.subButton[i+orbitScrollAmount-(scrollSize-1)].show();
+          }
+        }
+      }
+
+      this.getIndex = function(){
+        ind = -1;
+        if (PlanetSetting.isShown) {
+          for (var i = 0; i < SolarSystem[PlanetSetting.currentList[0]].planets.length; i++) {
+            if(PlanetSetting.orbitDropdown.MainButton.elt.textContent === PlanetSetting.orbitDropdown.subButton[i].elt.textContent){
+              ind = i;
+              break;
+            }
+          }
+        }else {
+          for (var i = 0; i < SolarSystem[CreatePlanet.currentList].planets.length; i++) {
+            if(CreatePlanet.orbitDropdown.MainButton.elt.textContent === CreatePlanet.orbitDropdown.subButton[i].elt.textContent){
+              ind = i;
+              break;
+            }
+          }
+        }
+        return ind;
+      }
+
+      this.show = function(solarIndex, planetIndex){
+        this.mainText.show();
+        this.MainButton.show();
+        orbitIndex = SolarSystem[solarIndex].planets[planetIndex].Orbit;
+        this.MainButton.elt.textContent = SolarSystem[solarIndex].planets[orbitIndex].name;
+        for (var i = 0; i < SolarSystem[solarIndex].planets.length; i++) {
+          this.subButton[i].elt.textContent = SolarSystem[solarIndex].planets[i].name;
+        }
+      }
+      this.hide = function(){
+        this.ShowList = false;
+        for (var i = 0; i < this.subButton.length; i++) {
+          this.subButton[i].elt.textContent = "";
+          this.subButton[i].hide();
+        }
+        this.MainButton.hide();
+        this.mainText.hide();
+      }
+    }
+    function Slider(name,min,max,start,step,x,y,w,h){
+      sliderArr.push(this);
+      this.index = sliderArr.length-1;
+      this.x = x;
+      this.y = y;
+      this.w = w+4;
+      this.h = h;
+      this.isShown = false;
+      this.NUMBERINPUT = false;
+      this.text = new Text(name, x, y, w+4, h);
+      // this.number = new Text(start, x, y+h, w+4, h);
+      this.number = createButton(start);
+      this.number.position(x, y+h);
+      this.number.size(w+4, h);
+      this.number.class('textClickable');
+      this.numberInput = createInput(start,'number');
+      this.numberInput.size(w+4,h-2);
+      this.numberInput.position(x,y+h);
+      this.numberInput.class('setInput');
+      this.numberInput.value("");
+      this.numberInput.input(function(){
+        for (var i = 0; i < sliderArr.length; i++) {
+          if(sliderArr[i].numberInput == this){
+            sliderArr[i].NUMBERINPUT = true;
+            sliderArr[i].number.elt.textContent = "";
+          }
+        }
+      });
+      this.slider = createSlider(min,max,start,step);
+      this.slider.value(start);
+      this.slider.position(x,y+h+h);
+      this.slider.size(w,h);
+
+      this.updateNumber = function(num){
+        this.number.elt.textContent = num;
+        this.slider.value(num);
+      }
+
+      this.hide = function(){
+        this.text.hide();
+        this.number.hide();
+        this.slider.hide();
+        this.numberInput.value("");
+        this.numberInput.hide();
+        this.NUMBERINPUT = false;
+        this.isShown = false;
+      }
+      this.show = function(){
+        this.text.show();
+        this.number.show();
+        this.slider.show();
+        this.isShown = true;
+        this.numberInput.show();
+      }
+    }
+
+    function drawMainSetting(){
+      this.isShown = false;
+      this.solarButton = [];
+      for (var i = 0; i< SolarSystem.length; i++) {
+        temp = createButton(SolarSystem[i].name);
+        temp.class("button PlanetButton");
+        temp.style('background: url(UI-Textures/' + SolarSystem[i].UIName + '.jpg);');
+        temp.style("background-repeat: no-repeat");
+        temp.style("background-size: cover");
+        temp.size(width/10,25);
+        temp.position(settingX+(width-settingX)/4,i*30+30);
+        this.solarButton.push(temp);
+      }
+      for (var j = 0; j < this.solarButton.length; j++) {
+        this.solarButton[j].mouseReleased(function(event){
+          var a = -1;
+          for(var i = 0; i < MainSetting.solarButton.length; i++){
+            if(event.x > MainSetting.solarButton[i].x && event.x < MainSetting.solarButton[i].x+MainSetting.solarButton[i].width && event.y > MainSetting.solarButton[i].y && event.y < MainSetting.solarButton[i].y+MainSetting.solarButton[i].height){
+              a = i;
+              break;
+            }
+          }
+          if (a == -1) {
+            a = 0;
+            console.error("Solar Index = -1");
+          }
+          cList = [a, -1];
+          MainSetting.isShown = false;
+          SolarSetting.isShown = true;
+        });
+      }
+      this.create = createButton("Create");
+      this.create.class("button CreateButton");
+      this.create.size(width/10,25);
+      this.create.mouseReleased(function(){
+        // CreatePlanet.isShown = true;
+        // MainSetting.isShown = false;
+        // StopRotation = true;
+      });
+      // for(var i = 0; i < SolarSystem.length; i++){
+      //   SolarSystem[i].MainButton = new createPlanetSetting(Planets[i].name,i,settingX+(width-settingX)/4,i*30+30,Planets[i].name);
+      // }
+      this.redraw = function(){
+        for(var i = 0; i <   MainSetting.solarButton.length; i++){
+          MainSetting.solarButton[i].position(settingX+50,i*30+30);
+        }
+        MainSetting.create.position(settingX+50,  MainSetting.solarButton.length*30+30);
+      }
+      this.hide = function(){
+        for(var i = 0; i <   MainSetting.solarButton.length; i++){
+            MainSetting.solarButton[i].hide();
+        }
+        this.create.hide();
+        this.isShown = false;
+      }
+      this.show = function(){
+        for(var i = 0; i <   MainSetting.solarButton.length; i++){
+            MainSetting.solarButton[i].show();
+        }
+        this.create.position(settingX+(width-settingX)/4,MainSetting.solarButton.length*30+30);
+        this.create.show();
+      }
+    }
+    function drawSolarSetting(){
+      wdh = width-settingX
+      mtx = width-(wdh/1.2);
+      h1x = width-(wdh/1.4);
+      this.isShown = false;
+      this.currentList = -1
+      this.heading = new Text("",settingX+(wdh/40),40,wdh-(wdh/20),40);
+      this.goto = createButton('GoTo');
+      this.goto.class("button");
+      this.goto.position(SButton.x-58.23,5);
+      this.goto.mouseReleased(function(){Player.x = SolarSystem[SolarSetting.currentList].x - 3600; Player.y = SolarSystem[SolarSetting.currentList].y - 3600; Player.z = SolarSystem[SolarSetting.currentList].z + 2000; DragX = 63; DragY = 626;});
+      this.back = createButton('Back');
+      this.back.class("button");
+      this.back.position(SButton.x-58.23-47.58-10,5);
+      this.back.mouseReleased(function(){
+        MainSetting.isShown = true;
+        SolarSetting.isShown = false;
+      });
+      hX = settingX+(wdh/40);
+      hW = wdh-(wdh/20);
+      this.planetButton = [];
+      for (var i = 0; i*30+90 < height; i++) {
+        temp = createButton("");
+        temp.class("button PlanetButton");
+        temp.position(hX+(hW-(width/10))/2,i*30+90);
+        temp.size(width/10,25);
+        this.planetButton.push(temp);
+      }
+      for (var j = 0; j < this.planetButton.length; j++) {
+        this.planetButton[j].mouseReleased(function(event){
+          var a = -1;
+          for(var i = 0; i < SolarSetting.planetButton.length; i++){
+            if(event.x > SolarSetting.planetButton[i].x && event.x < SolarSetting.planetButton[i].x+SolarSetting.planetButton[i].width && event.y > SolarSetting.planetButton[i].y && event.y < SolarSetting.planetButton[i].y+SolarSetting.planetButton[i].height){
+              a = i;
+              break;
+            }
+          }
+          if (a == -1) {
+            a = 0;
+            console.error("Planet Index = -1");
+          }
+          cList = [SolarSetting.currentList, a];
+          PlanetSetting.isShown = true;
+          SolarSetting.isShown = false;
+          PlanetSetting.RevolutionSlider.updateNumber(SolarSystem[cList[0]].planets[cList[1]].revolution);
+        });
+      }
+      this.create = createButton("Create");
+      this.create.class("button CreateButton");
+      this.create.size(width/10,25);
+      this.create.mouseReleased(function(event){
+        cList = [SolarSetting.currentlist, -1];
+        CreatePlanet.isShown = true;
+        SolarSetting.isShown = false;
+      });
+
+      this.show = function(index) {
+        this.currentList = index;
+        this.heading.setText(SolarSystem[index].name);
+        this.heading.text.style('background: url(UI-Textures/' + SolarSystem[index].UIName + '.jpg);');
+        this.heading.show();
+        var i = 0;
+        for (i; i < SolarSystem[index].planets.length; i++) {
+          this.planetButton[i].elt.textContent = SolarSystem[index].planets[i].name;
+          this.planetButton[i].style('background: url(UI-Textures/' + SolarSystem[index].planets[i].UIName + '.jpg);');
+          this.planetButton[i].style("background-repeat: no-repeat");
+          this.planetButton[i].style("background-size: cover");
+          this.planetButton[i].show();
+        }
+        this.create.position(hX+(hW-(width/10))/2,i*30+90);
+        this.create.show();
+        this.goto.show();
+        this.back.show();
+      }
+      this.hide = function(index) {
+        this.isShown = false;
+        this.currentList = -1;
+        this.heading.hide();
+        for (var i = 0; i < this.planetButton.length; i++) {
+          this.planetButton[i].hide();
+        }
+        this.goto.hide();
+        this.back.hide();
+        this.create.hide();
+      }
+    }
+    function drawPlanetSetting(){//the planets setting
+      wdh = width-settingX
+      mtx = width-(wdh/1.2);
+      h1x = width-(wdh/1.4);
+      this.isShown = false;
+      this.currentList = [-1,-1]
+      this.MainText = new Text("",mtx,40,wdh/(10/7),wdh/(20/7));
+      // this.MainText.text.style("background","url(UI-Textures/"+fileName+".jpg)");
+      // this.MainText.text.style("background-size: cover");
+      // this.MainText.text.style("color","white");
+      this.travelTo = createButton("Follow");
+      this.travelTo.class("button");
+      this.travelTo.position(SButton.x-58.23-5,5);
+      this.travelTo.mouseReleased(function(){
+        if(!Player.isFollowing){
+          Player.isFollowing = true;
+          Player.followPlanet = PlanetSetting.currentList;
+          Player.height = SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].size;
+          this.style('background-color', 'red');
+          untravel.removeAttribute('disabled');
+          untravel.style('background-color', selected);
+          untravel.class("button");
+        }else{
+          if (red(PlanetSetting.travelTo.style("background-color")) == 255) {
+            PlanetSetting.travelTo.style('background-color', null);
+            untravel.attribute('disabled', '');
+            untravel.style('background-color', "grey");
+            untravel.class("text");
+            Player.isFollowing = false;
+          }else {
+            Player.followPlanet = PlanetSetting.currentList;
+            Player.height = SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].size;
+            this.style('background-color', 'red');
+          }
+        }
+      });
+      this.back = createButton('Back');
+      this.back.class("button");
+      this.back.position(SButton.x-58.23-47.58-10,5);
+      this.back.mouseReleased(function(){
+        cList = [PlanetSetting.currentList[0], -1];
+        PlanetSetting.isShown = false;
+        SolarSetting.isShown = true;
+      });
+      inx = settingX+(200-173)/2;
+      iny = 60+wdh/(20/7);
+      yStep = (height/62.5)+42;
+      this.distinceInput = new Input("Orbit Distince",inx,iny,wdh/(200/173),21,"number",100);
+      this.distinceInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].distince = PlanetSetting.distinceInput.input.value(); });
+      this.sizeInput = new Input("Size",inx,iny+yStep,wdh/(200/173),21,"number",50);
+      this.sizeInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].size = PlanetSetting.sizeInput.input.value(); });
+      this.SSpeedInput = new Input("Spin Speed",inx,iny+yStep*2,wdh/(200/173),21,"number",1);
+      this.SSpeedInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].Sspeed = PlanetSetting.SSpeedInput.input.value(); });
+      this.OSpeedInput = new Input("Orbit Speed",inx,iny+yStep*3,wdh/(200/173),21,"number",.5);
+      this.OSpeedInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].Ospeed = PlanetSetting.OSpeedInput.input.value(); });
+      this.RevolutionSlider = new Slider("Revolution",-TWO_PI,TWO_PI,0,.000000001,inx,iny+yStep*4,wdh/(200/173),21);
+      this.textureDropdown = new TextureDropdown("Texture",-1,inx,iny+yStep*5+21,(wdh*3)/7,21,this);
+      this.orbitDropdown = new OrbitDropdown("Orbit",-1,inx+(wdh*4)/9,iny+yStep*5+21,(wdh*3)/7,21,this);
+      // this.delete = createButton("Delete");
+      // this.delete.class("button");
+      // this.delete.position(settingX+((wdh/2)-(58.25/2)),iny+305);
+      // this.delete.mouseReleased(function(){
+      //   this.hide();
+      //   Planets.splice(index,1);
+      //   Setting.redraw();
+      // });
+      this.show = function(solarIndex, planetIndex){
+        this.currentList = [solarIndex, planetIndex];
+        this.MainText.show();
+        this.MainText.setText(SolarSystem[solarIndex].planets[planetIndex].name);
+        this.MainText.text.style('background: url(UI-Textures/' + SolarSystem[solarIndex].planets[planetIndex].UIName + '.jpg);');
+        this.travelTo.show();
+        if (Player.isFollowing) {
+          if (PlanetSetting.currentList[0] == Player.followPlanet[0] && PlanetSetting.currentList[1] == Player.followPlanet[1]) {
+            PlanetSetting.travelTo.style('background-color', 'red');
+          }else {
+            PlanetSetting.travelTo.style('background-color', null);
+          }
+        }
+        this.back.show();
+        this.distinceInput.show();
+        this.distinceInput.input.elt.value = SolarSystem[solarIndex].planets[planetIndex].distince;
+        this.sizeInput.show();
+        this.sizeInput.input.elt.value = SolarSystem[solarIndex].planets[planetIndex].size;
+        this.SSpeedInput.show();
+        this.SSpeedInput.input.elt.value = SolarSystem[solarIndex].planets[planetIndex].Sspeed;
+        this.OSpeedInput.show();
+        this.OSpeedInput.input.elt.value = SolarSystem[solarIndex].planets[planetIndex].Ospeed;
+        this.RevolutionSlider.show();
+        this.textureDropdown.show(SolarSystem[solarIndex].planets[planetIndex].textureIndex);
+        this.orbitDropdown.show(solarIndex, planetIndex);
+      }
+      this.hide = function(){
+        this.isShown = false;
+        this.currentList = [-1,-1];
+        this.back.hide();
+        this.MainText.hide();
+        this.travelTo.hide();
+        this.distinceInput.hide();
+        this.sizeInput.hide();
+        this.SSpeedInput.hide();
+        this.OSpeedInput.hide();
+        this.RevolutionSlider.hide();
+        this.textureDropdown.hide();
+        this.orbitDropdown.hide();
+      }
+    }
+
+    function drawCreatePlanet(){
+      this.x = 0;
+      this.y = 0;
+      this.isShown = false;
+      this.currentList = -1;
+      this.back = createButton("Cancel");
+      this.back.mouseReleased(function(){
+        CreatePlanet.isShown = false;
+        StopRotation = false;
+      });
+      this.submit = createButton("Create");
+      this.submit.mouseReleased(function(){
+        name = CreatePlanet.nameInput.input.value();
+        unique = true;
+        for (var i = 0; i < SolarSystem.length; i++) {
+          for (var j = 0; j < SolarSystem[i].planets.length; j++) {
+            if(SolarSystem[i].planets[i].name === name){
+              unique = false;
+              break;
+            }
+          }
+        }
+
+        if(unique){
+          radius = CreatePlanet.sizeInput.input.value();
+          distince = CreatePlanet.distinceInput.input.value();
+          speedRotation = CreatePlanet.SSpeedInput.input.value();
+          speedOrbit = CreatePlanet.OSpeedInput.input.value();
+          revolution = CreatePlanet.RevolutionSlider.slider.value();
+          orbit = CreatePlanet.orbitDropdown.getIndex();
+          solarIndex = CreatePlanet.currentList
+          index = CreatePlanet.textureDropdown.getIndex();
+
+          new Planet(name,radius,distince,speedRotation,speedOrbit,revolution,orbit,solarIndex,index);
+          Setting.redraw();
+          CreatePlanet.isShown = false;
+          StopRotation = false;
+          CreatePlanet.Reset();
+          CreatePlanet.nameInput.input.style("background-color: white");
+          CreatePlanet.nameInput.input.style("color: black");
+          CreatePlanet.nameInput.text.setText("Name");
+        }else {
+          CreatePlanet.nameInput.input.style("background-color: red");
+          CreatePlanet.nameInput.input.style("color: white");
+          CreatePlanet.nameInput.text.setText("Name already in use");
+        }
+      });
+      this.auto = createButton("Auto");
+      this.auto.mouseReleased(function(){
+        orbit = int(random(Planets.length));
+        distince = random(Planets[orbit].size*2,Planets[orbit].size*50);
+        size = random(Planets[orbit].size*.1,Planets[orbit].size*.8);
+        Sspeed = random(.1,3);
+        Ospeed = random(Planets[orbit].Ospeed*1.1,Planets[orbit].Ospeed*3);
+        revolution = random(TWO_PI);
+        txture = int(random(TextureArray.length));
+        var unique;
+        for (var n = 1; n < 100; n++) {
+          unique = true;
+          name = TextureArray[txture].name + n;
+          for (var i = 0; i < Planets.length; i++) {
+            if(Planets[i].name === name){
+              unique = false;
+              break;
+            }
+          }
+          if (unique) { break; }
+        }
+        CreatePlanet.nameInput.input.value(name);
+        CreatePlanet.distinceInput.input.value(distince);
+        CreatePlanet.sizeInput.input.value(size);
+        CreatePlanet.SSpeedInput.input.value(Sspeed);
+        CreatePlanet.OSpeedInput.input.value(Ospeed);
+        CreatePlanet.RevolutionSlider.slider.value(revolution);
+        CreatePlanet.RevolutionSlider.updateNumber(revolution);
+        CreatePlanet.textureDropdown.MainButton.elt.textContent = TextureArray[txture].name;
+        CreatePlanet.orbitDropdown.MainButton.elt.textContent = Planets[orbit].name;
+      });
+      wd = width-settingX;
+      inx = settingX+(wd/20);
+      iny = 60;
+      this.mainText = new Text("Create a Planet",settingX+(wd/40),5,wd-(wd/20),40);
+      this.nameInput = new Input("","Name",null,null,inx,iny,wd-(wd/10),21,null,null);
+      this.distinceInput = new Input("","Orbit Distince",null,null,inx,iny+60,wd-(wd/10),21,"number",10);
+      this.distinceInput.input.elt.step = 100;
+      this.sizeInput = new Input("","Size",null,null,inx,iny+120,wd-(wd/10),21,"number",50);
+      this.SSpeedInput = new Input("","Spin Speed",null,null,inx,iny+180,wd-(wd/10),21,"number",1);
+      this.OSpeedInput = new Input("","Orbit Speed",null,null,inx,iny+240,wd-(wd/10),21,"number",.5);
+      this.RevolutionSlider = new Slider("Revolution",-TWO_PI,TWO_PI,0,.00000000000000000000000000000001,inx,iny+300,wd-(wd/10),21,this);
+      this.textureDropdown = new TextureDropdown("Texture",0,inx,iny+370,(wd*3)/7,21,this);
+      this.orbitDropdown = new OrbitDropdown("Orbit",0,inx+(wd)/2,iny+370,(wd*3)/7,21,this);
+
+      this.back.size((wd/3),21);
+      this.back.position(inx,iny+420);
+      this.back.class("button");
+      this.back.style("background-color","red");
+      this.auto.size((wd/4.36),21);
+      this.auto.position(inx+(1.05*wd/3),iny+420);
+      this.auto.class("button");
+      this.auto.style("background-color","orange");
+      this.submit.size((wd/3),21);
+      this.submit.position(inx+(1.8*wd/3),iny+420);
+      this.submit.class("button");
+      this.submit.style("background-color","blue");
+
+      this.Reset = function(){
+        this.nameInput.input.elt.value = "";
+        this.distinceInput.input.elt.value = "";
+        this.sizeInput.input.elt.value = "";
+        this.SSpeedInput.input.elt.value = "";
+        this.OSpeedInput.input.elt.value = "";
+        this.RevolutionSlider.updateNumber(0);
+        this.RevolutionSlider.slider.value(0);
+        this.textureDropdown.MainButton.elt.textContent = Planets[0].name;
+        this.orbitDropdown.MainButton.elt.textContent = Planets[0].name;
+      }
+
+      this.hide = function(){
+        this.back.hide();
+        this.auto.hide();
+        this.submit.hide();
+        this.mainText.hide();
+        this.nameInput.hide();
+        this.distinceInput.hide();
+        this.sizeInput.hide();
+        this.SSpeedInput.hide();
+        this.OSpeedInput.hide();
+        this.RevolutionSlider.hide();
+        this.textureDropdown.hide();
+        this.orbitDropdown.hide();
+        this.currentList = -1;
+        this.isShown = false;
+      }
+      this.show = function(solarIndex){
+        this.currentList = solarIndex;
+        this.back.show();
+        this.auto.show();
+        this.submit.show();
+        this.mainText.show();
+        this.nameInput.show();
+        this.distinceInput.show();
+        this.sizeInput.show();
+        this.SSpeedInput.show();
+        this.OSpeedInput.show();
+        this.RevolutionSlider.show();
+        this.textureDropdown.show();
+        this.orbitDropdown.show();
+        this.isShown = true;
+      }
+    }
+    function createAstroid(number, distince, orbit, solarIndex){
+      for (var i = 0; i < number; i++) {
+        Distince = random(distince*.9,distince*1.1);
+        size = random(25,100);
+        Sspeed = random(.1,3);
+        Ospeed = random(.5,2);
+        revolution = random(TWO_PI);
+        index = getTextureIndex("Astroid"+int(random(1,5)));
+        new Astroid(size,Distince,Sspeed,Ospeed,revolution,orbit,solarIndex,index);
+      }
+    }
+    function createRing(density, planetIndex){
+       minDis = Planets[planetIndex].size / .775;
+       maxDis = Planets[planetIndex].size / .298076923;
+      num = (maxDis - minDis)*density;
+      avSize = Planets[planetIndex].size / 250;
+      for (var i = 0; i < num; i++) {
+        Distince = random(minDis,maxDis);
+        size = random(avSize * .8,avSize * 1.3);
+        Sspeed = random(.1,3);
+        Ospeed = random(.5,2);
+        revolution = random(TWO_PI);
+        index = getTextureIndex("Astroid"+int(random(1,5)));
+        new Astroid(size,Distince,Sspeed,Ospeed,revolution,planetIndex,index);
+      }
+    }
+
+    </script>
+  </body>
+</html>
