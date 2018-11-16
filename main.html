@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Stellar Light</title>
-    <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+    <link rel="shortcut icon" type="image/png" href="/UI-Textures/favicon.png"/>
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
     <style> body {padding: 0; margin: 0;} </style>
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
@@ -93,7 +93,7 @@
     var tempArr = [];
     var StarTexture, gameSound;
     var fr, didtince, timeScaler, speedVar = 1;
-    var Pause = false;
+    var Pause = true;
     var StopRotation = false;
     var Pan = false;
     var DRAWGRID = false;
@@ -164,6 +164,7 @@
       new Texture("Astroid2",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid2.jpg', TextureArray);
       new Texture("Astroid3",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid3.jpg', TextureArray);
       new Texture("Astroid4",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid4.jpg', TextureArray);
+      Pause = false;
     }
     function loadAssets(){
       new Texture("Defult",'https://cmworks.github.io/Stellar-Light/UI-Textures/defult.jpg', Assets);
@@ -505,15 +506,17 @@
       Player.speed = temp;
     }
     function mouseDragged() {
-      if(mouseX < width && mouseY < height && (mouseY > 53 || mouseX > 400)){
-        accelerationX += mouseX - preDragX;
-        accelerationY += mouseY - preDragY;
-        if((PlanetSetting.isShown || CreatePlanet.isShown) && (mouseX < settingX || mouseY > 580)){
-          DragX += mouseX - preDragX;
-          DragY += mouseY - preDragY;
-        }else if(!PlanetSetting.isShown && !CreatePlanet.isShown){
-          DragX += mouseX - preDragX;
-          DragY += mouseY - preDragY;
+      if (!Pause) {
+        if(mouseX < width && mouseY < height && (mouseY > 53 || mouseX > 400)){
+          accelerationX += mouseX - preDragX;
+          accelerationY += mouseY - preDragY;
+          if((PlanetSetting.isShown || CreatePlanet.isShown) && (mouseX < settingX || mouseY > 580)){
+            DragX += mouseX - preDragX;
+            DragY += mouseY - preDragY;
+          }else if(!PlanetSetting.isShown && !CreatePlanet.isShown){
+            DragX += mouseX - preDragX;
+            DragY += mouseY - preDragY;
+          }
         }
       }
     }
@@ -1305,7 +1308,7 @@
             MainSetting.solarButton[i].show();
         }
         this.create.position(settingX+(width-settingX)/4,MainSetting.solarButton.length*30+30);
-        this.create.show();
+        this.create.hide();
       }
     }
     function drawSolarSetting(){
@@ -1378,7 +1381,7 @@
           this.planetButton[i].show();
         }
         this.create.position(hX+(hW-(width/10))/2,i*30+90);
-        this.create.show();
+        this.create.hide();
         this.goto.show();
         this.back.show();
       }
