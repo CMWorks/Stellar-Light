@@ -124,15 +124,17 @@
     var AAA = 1000;
 
     function preload() {
-      planetNUM = prompt("How many planets do you want?",9);
-      astroid = prompt("How many astroids do you want?",0);
-      if (planetNUM == null) {
-        planetNUM = 9;
+      selected = false;
+      while (!selected) {
+        planetNUM = prompt("How many planets do you want?",9);
+        astroid = prompt("How many astroids do you want?",0);
+        if (planetNUM != null) {
+          selected = true;
+        }
+        if (astroid != null) {
+          selected = true;
+        }
       }
-      if (astroid == null) {
-        astroid = 0;
-      }
-      console.log(planetNUM +", "+ astroid);
       loadLowRes();
       loadAssets();
     }
@@ -593,28 +595,30 @@
       }
     }
     function mouseReleased() {
-      if (PlanetSetting.textureDropdown.ShowList) {
-        x = PlanetSetting.textureDropdown.x;
-        y = PlanetSetting.textureDropdown.y;
-        w = PlanetSetting.textureDropdown.w;
-        h = PlanetSetting.textureDropdown.h;
-        if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
-          for (var i = 0; i < PlanetSetting.textureDropdown.subButton.length; i++) {
-            PlanetSetting.textureDropdown.subButton[i].hide();
+      if (!Pause) {
+        if (PlanetSetting.textureDropdown.ShowList) {
+          x = PlanetSetting.textureDropdown.x;
+          y = PlanetSetting.textureDropdown.y;
+          w = PlanetSetting.textureDropdown.w;
+          h = PlanetSetting.textureDropdown.h;
+          if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
+            for (var i = 0; i < PlanetSetting.textureDropdown.subButton.length; i++) {
+              PlanetSetting.textureDropdown.subButton[i].hide();
+            }
+            PlanetSetting.textureDropdown.ShowList = false;
           }
-          PlanetSetting.textureDropdown.ShowList = false;
         }
-      }
-      if (PlanetSetting.orbitDropdown.ShowList) {
-        x = PlanetSetting.orbitDropdown.x;
-        y = PlanetSetting.orbitDropdown.y;
-        w = PlanetSetting.orbitDropdown.w;
-        h = PlanetSetting.orbitDropdown.h;
-        if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
-          for (var i = 0; i < PlanetSetting.orbitDropdown.subButton.length; i++) {
-            PlanetSetting.orbitDropdown.subButton[i].hide();
+        if (PlanetSetting.orbitDropdown.ShowList) {
+          x = PlanetSetting.orbitDropdown.x;
+          y = PlanetSetting.orbitDropdown.y;
+          w = PlanetSetting.orbitDropdown.w;
+          h = PlanetSetting.orbitDropdown.h;
+          if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
+            for (var i = 0; i < PlanetSetting.orbitDropdown.subButton.length; i++) {
+              PlanetSetting.orbitDropdown.subButton[i].hide();
+            }
+            PlanetSetting.orbitDropdown.ShowList = false;
           }
-          PlanetSetting.orbitDropdown.ShowList = false;
         }
       }
     }
