@@ -4,10 +4,15 @@
     <title>Stellar Light</title>
     <link rel="shortcut icon" type="image/png" href="https://cmworks.github.io/Stellar-Light/UI-Textures/favicon.png"/>
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
-    <style> body {padding: 0; margin: 0;} </style>
+    <style> body {background-image: url("https://cmworks.github.io/src/background.png");background-size: cover;} </style>
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
     <style>
+      h1 {
+        text-align: center;
+        color: 	#C5B358;
+        font-size: 40px;
+      }
       .button {
         background-color: #4CAF50;
         border: none;
@@ -70,9 +75,19 @@
         border: none;
         color: white;
       }
+      .full {
+        background-color: Transparent;
+        background-image: url("https://cmworks.github.io/Stellar-Light/UI-Textures/fullscreen.png");
+        background-size: cover;
+        border: none;
+      }
+      .full:hover {
+        cursor: pointer;
+      }
     </style>
   </head>
   <body>
+    <h1>Stellar Light</h1>
     <script>
     var SolarSystem = [];
     var Astroids = [];
@@ -122,7 +137,8 @@
     var keyMAP = {};
     var AAA = 1000;
     var cnv;
-    var SButton,GButton,PButton,SRButton,PANButton,untravel;
+    var SButton,GButton,PButton,SRButton,PANButton,untravel,fullscreen;
+    var RESIZE = true;
 
     function preload() {
       loadLowRes();
@@ -209,10 +225,12 @@
 
     function windowResized() {
       centerCanvas();
-      if (windowWidth/1.3 < 460) {
-        resizeCanvas(460, (windowHeight/1.3)-4);
-      }else {
-        resizeCanvas(windowWidth/1.3, (windowHeight/1.3)-4);
+      if (RESIZE) {
+        if (windowWidth/1.3 < 460) {
+          resizeCanvas(460, (windowHeight/1.3)-4);
+        }else {
+          resizeCanvas(windowWidth/1.3, (windowHeight/1.3)-4);
+        }
       }
     }
     function centerCanvas() {
@@ -243,6 +261,7 @@
       SRButton.position(timeScaler.w+timeScaler.x+10,cnv.y+21);
       PANButton.position(PButton.width+PButton.x+10,cnv.y);
       untravel.position(PANButton.width+PANButton.x+5,cnv.y+PANButton.height);
+      fullscreen.position(cnv.x+cnv.width-5-30,cnv.y+cnv.height-5-30);
       MainSetting.redraw();
       SolarSetting.redraw();
       PlanetSetting.redraw();
@@ -261,17 +280,17 @@
       angleMode(RADIANS);
       planetNUM = 9;
       astroid = 0;
-      // slc = false;
-      // while (!slc) {
-      //   planetNUM = prompt("How many planets do you want?",9);
-      //   astroid = prompt("How many astroids do you want?",0);
-      //   if (planetNUM != null) {
-      //     slc = true;
-      //   }
-      //   if (astroid != null) {
-      //     slc = true;
-      //   }
-      // }
+      slc = false;
+      while (!slc) {
+        planetNUM = prompt("How many planets do you want?",9);
+        astroid = prompt("How many astroids do you want?",0);
+        if (planetNUM != null) {
+          slc = true;
+        }
+        if (astroid != null) {
+          slc = true;
+        }
+      }
       if (planetNUM - 1 >= 0) {
         Sun = new Planet("Sun",1000,0,.87,0,0,0,0,1,"Sun");
       }if (planetNUM - 2 >= 0) {
@@ -963,6 +982,34 @@
         untravel.style('background-color', "grey");
         untravel.class("text");
         Player.isFollowing = false;
+      });
+      fullscreen = createButton("");
+      fullscreen.class("full");
+      fullscreen.position(cnv.x+cnv.width-5-30,cnv.y+cnv.height-5-30);
+      fullscreen.size(30,30);
+      fullscreen.mouseReleased(function(){
+        if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+         (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+          if (document.documentElement.requestFullScreen) {
+            document.documentElement.requestFullScreen();
+          } else if (document.documentElement.mozRequestFullScreen) {
+            document.documentElement.mozRequestFullScreen();
+          } else if (document.documentElement.webkitRequestFullScreen) {
+            document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+          }
+          resizeCanvas(displayWidth, displayHeight,WEBGL);
+          RESIZE = false;
+        } else {
+          if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+          }
+          RESIZE = true;
+          resizeCanvas(windowWidth/1.3, (windowHeight/1.3)-4);
+        }
       });
     }
     function screen(imageURL){
