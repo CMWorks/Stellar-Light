@@ -5,19 +5,9 @@
     <link rel="shortcut icon" type="image/png" href="https://cmworks.github.io/Stellar-Light/UI-Textures/favicon.png"/>
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
     <style> body {padding: 0; margin: 0;} </style>
-    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
-    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
     <style>
-      /* canvas {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 50%;
-        height: 50%;
-        padding: 20px;
-        text-align: center;
-      } */
       .button {
         background-color: #4CAF50;
         border: none;
@@ -116,22 +106,23 @@
     var preDragY = 0;
     var accelerationX = 0;
     var accelerationY = 0;
-    var SButton;
     var MainSetting;
     var settingX;
     var SolarSetting;
     var PlanetSetting;
     var Create;
     var UPNUM = 0;
+    var CANUPDATE = 0;
     var sliderArr = [];
     var astroid = 0;
     var planetNUM = 9;
     var slider;
-    var untravel;
     var cList = [-1,-1];
     var selected = "blue"
-    var keyMAP = {}; // You could also use an array
+    var keyMAP = {};
     var AAA = 1000;
+    var cnv;
+    var SButton,GButton,PButton,SRButton,PANButton,untravel;
 
     function preload() {
       loadLowRes();
@@ -216,31 +207,71 @@
       return index;
     }
 
-    function setup() {
-      var cnv = createCanvas(windowWidth/1.3, (windowHeight/1.3)-4,WEBGL);
-      cnv.style('display', 'block');
+    function windowResized() {
+      centerCanvas();
+      if (windowWidth/1.3 < 460) {
+        resizeCanvas(460, (windowHeight/1.3)-4);
+      }else {
+        resizeCanvas(windowWidth/1.3, (windowHeight/1.3)-4);
+      }
+    }
+    function centerCanvas() {
       var x = (windowWidth - width) / 2;
       var y = (windowHeight - height) / 2;
-      console.log(x +", "+ y);
       cnv.position(x, y);
-      //createCanvas(displayWidth/1.3, (displayHeight/1.3)-4,WEBGL);
-      //createCanvas(1500,900,WEBGL);
-      setAttributes('antialias', true);
+    }
+    function redrawCvs() {
+      settingX = width-width/7;
+      fr.text.position(cnv.x,cnv.y);
+      if (width/15<40) {
+        fr.text.size(40,46);
+      }else if (width/15 > 95) {
+        fr.text.size(95,46);
+      }else {
+        fr.text.size(width/15,46);
+      }
+      SButton.position(cnv.x+width-SButton.width-10,cnv.y+5);
+      GButton.position(SButton.x-GButton.width-10,cnv.y+5);
+      if (width/13<87) {
+        timeScaler.redraw(fr.text.x+fr.text.width+3,cnv.y,87,16);
+      }else if (width/13>130) {
+        timeScaler.redraw(fr.text.x+fr.text.width+3,cnv.y,130,16);
+      }else {
+        timeScaler.redraw(fr.text.x+fr.text.width+3,cnv.y,width/13,16);
+      }
+      PButton.position(timeScaler.w+timeScaler.x+10,cnv.y);
+      SRButton.position(timeScaler.w+timeScaler.x+10,cnv.y+21);
+      PANButton.position(PButton.width+PButton.x+10,cnv.y);
+      untravel.position(PANButton.width+PANButton.x+5,cnv.y+PANButton.height);
+      MainSetting.redraw();
+      SolarSetting.redraw();
+      PlanetSetting.redraw();
+    }
+    function setup() {
+      // cnv = createCanvas(displayWidth, displayHeight,WEBGL);
+      cnv = createCanvas(windowWidth/1.3, (windowHeight/1.3)-4,WEBGL);
+      centerCanvas();
+
+
+      // setAttributes('antialias', true);
+
+
       camera(0, 0, 1, 0, 0, 0, 0, 1, 0);
       perspective(PI/3.0, width/height, ((height/2.0) / tan(PI*60.0/360.0))/100.0,  ((height/2.0) / tan(PI*60.0/360.0))*Player.viewDistince);
-      // ortho(-width / 2, width / 2, height / 2, -height / 2, 0, 10000000000000);
       angleMode(RADIANS);
-      selected = false;
-      while (!selected) {
-        planetNUM = prompt("How many planets do you want?",9);
-        astroid = prompt("How many astroids do you want?",0);
-        if (planetNUM != null) {
-          selected = true;
-        }
-        if (astroid != null) {
-          selected = true;
-        }
-      }
+      planetNUM = 9;
+      astroid = 0;
+      // slc = false;
+      // while (!slc) {
+      //   planetNUM = prompt("How many planets do you want?",9);
+      //   astroid = prompt("How many astroids do you want?",0);
+      //   if (planetNUM != null) {
+      //     slc = true;
+      //   }
+      //   if (astroid != null) {
+      //     slc = true;
+      //   }
+      // }
       if (planetNUM - 1 >= 0) {
         Sun = new Planet("Sun",1000,0,.87,0,0,0,0,1,"Sun");
       }if (planetNUM - 2 >= 0) {
@@ -286,8 +317,15 @@
       CreatePlanet = new drawCreatePlanet();
       createAstroid(astroid,24000,0,0);
       // gameSound.loop();
+      background(0);
     }
     function draw() {
+      CANUPDATE++;
+      if(CANUPDATE>10){
+        centerCanvas();
+        redrawCvs();
+        CANUPDATE %= 10;
+      }
       if(!Pause){
         updateVarables();
         background(0);
@@ -343,8 +381,17 @@
       if(Player.isFollowing){
         accelerationX = SolarSystem[Player.followPlanet[0]].planets[Player.followPlanet[1]].Sspeed * 5.968310365945/speedVar;
       }
-      DragX += accelerationX/5;
-      DragY += accelerationY/5;
+      if((PlanetSetting.isShown || CreatePlanet.isShown) && ((mouseX > settingX && mouseX < width) && (mouseY < 580 && mouseY > 0))){
+        if (Player.isFollowing) {
+          DragX += accelerationX/5;
+          DragY += accelerationY/5;
+        }
+        // DragX -= accelerationX/5;
+        // DragY -= accelerationY/5;
+      }else {
+        DragX += accelerationX/5;
+        DragY += accelerationY/5;
+      }
       accelerationX/=1.6;
       accelerationY/=1.5;
       if (DragX > 1080 || DragX < -1080) {
@@ -532,7 +579,7 @@
     }
     function mouseDragged() {
       if (!Pause) {
-        if(mouseX < width && mouseY < height && (mouseY > 53 || mouseX > 400)){
+        if(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height && (mouseY > 53 || mouseX > 400)){
           accelerationX += mouseX - preDragX;
           accelerationY += mouseY - preDragY;
           if((PlanetSetting.isShown || CreatePlanet.isShown) && (mouseX < settingX || mouseY > 580)){
@@ -572,7 +619,7 @@
           y = PlanetSetting.textureDropdown.y;
           w = PlanetSetting.textureDropdown.w;
           h = PlanetSetting.textureDropdown.h;
-          if(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+(2*h)  &&  mouseY < y+((2+scrollSize)*h)){
+          if(mouseX+cnv.x > x  &&  mouseX+cnv.x < w+x  &&  mouseY+cnv.y > y+h  &&  mouseY+cnv.y < y+((2+scrollSize)*h)){
             PlanetSetting.textureDropdown.redraw();
             gotOne = true;
           }
@@ -583,7 +630,7 @@
           y = PlanetSetting.orbitDropdown.y;
           w = PlanetSetting.orbitDropdown.w;
           h = PlanetSetting.orbitDropdown.h;
-          if(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+(2*h)  &&  mouseY < y+((2+scrollSize)*h)){
+          if(mouseX+cnv.x > x  &&  mouseX+cnv.x < w+x  &&  mouseY+cnv.y > y+h  &&  mouseY+cnv.y < y+((2+scrollSize)*h)){
             PlanetSetting.orbitDropdown.redraw();
             gotOne = true;
           }
@@ -595,12 +642,12 @@
         if(!CreatePlanet.orbitDropdown.ShowList && !CreatePlanet.textureDropdown.ShowList){
           Player.height += (100*unit)*(Player.distinceToSurface()/750);
         }else if (!CreatePlanet.orbitDropdown.ShowList && CreatePlanet.textureDropdown.ShowList) {
-          CreatePlanet.textureDropdown.redraw();
+          CreatePlanet.this.textureDropdown.redraw();
         }else if (CreatePlanet.orbitDropdown.ShowList && !CreatePlanet.textureDropdown.ShowList) {
-          CreatePlanet.orbitDropdown.redraw();
+          CreatePlanet.this.orbitDropdown.redraw();
         }else {
-          CreatePlanet.textureDropdown.redraw();
-          CreatePlanet.orbitDropdown.redraw();
+          CreatePlanet.this.textureDropdown.redraw();
+          CreatePlanet.this.orbitDropdown.redraw();
         }
       }
       if(Pan && !gotOne) {
@@ -617,7 +664,7 @@
           y = PlanetSetting.textureDropdown.y;
           w = PlanetSetting.textureDropdown.w;
           h = PlanetSetting.textureDropdown.h;
-          if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
+          if(!(mouseX+cnv.x > x  &&  mouseX+cnv.x < w+x  &&  mouseY+cnv.y > y+h  &&  mouseY+cnv.y < y+((2+scrollSize)*h))){
             for (var i = 0; i < PlanetSetting.textureDropdown.subButton.length; i++) {
               PlanetSetting.textureDropdown.subButton[i].hide();
             }
@@ -629,7 +676,7 @@
           y = PlanetSetting.orbitDropdown.y;
           w = PlanetSetting.orbitDropdown.w;
           h = PlanetSetting.orbitDropdown.h;
-          if(!(mouseX > x  &&  mouseX < w+x  &&  mouseY > y+h  &&  mouseY < y+((2+scrollSize)*h))){
+          if(!(mouseX+cnv.x > x  &&  mouseX+cnv.x < w+x  &&  mouseY+cnv.y > y+h  &&  mouseY+cnv.y < y+((2+scrollSize)*h))){
             for (var i = 0; i < PlanetSetting.orbitDropdown.subButton.length; i++) {
               PlanetSetting.orbitDropdown.subButton[i].hide();
             }
@@ -851,63 +898,63 @@
       */
       //creats the UI
       // slider = createSlider(-10000,10000,0);
-      fr = new Text("FPS:",0,0,100,48);
+      fr = new Text("FPS:",cnv.x,cnv.y,100,48);
       SButton = createButton("Setting");
       SButton.class("button");
-      SButton.position(width-SButton.width-10,5);
-      SButton.mouseReleased(function(){ if(MainSetting.isShown){MainSetting.isShown = false; SButton.elt.style.backgroundColor= "#4CAF50";}else{MainSetting.isShown = true; SButton.elt.style.backgroundColor=selected;} });
+      SButton.position(cnv.x+width-SButton.width-10,cnv.y+5);
+      SButton.mouseReleased(function(){ if(MainSetting.isShown){MainSetting.isShown = false; SButton.elt.style.backgroundColor="#4CAF50";}else{MainSetting.isShown = true; SButton.elt.style.backgroundColor=selected;} });
       GButton = createButton("Grid");
       GButton.class("button");
-      GButton.position(SButton.x-GButton.width-10,5);
+      GButton.position(SButton.x-GButton.width-10,cnv.y+5);
       GButton.mouseReleased(function(){if(DRAWGRID){DRAWGRID = false; GButton.elt.style.backgroundColor= "#4CAF50";}else{DRAWGRID = true; GButton.elt.style.backgroundColor=selected}});
-      timeScaler = new Slider("Time Scaler",0.001,3,1,.001,100,0,129,16);
-      var a = createButton("Pause");
-      a.class("button");
-      a.position(timeScaler.w+timeScaler.x+5,0);
-      a.size(110,a.height);
-      a.mouseReleased(function(){
+      timeScaler = new Slider("Time Scaler",0.001,3,1,.001,cnv.x+100,cnv.y,120,16);
+      PButton = createButton("Pause");
+      PButton.class("button");
+      PButton.position(timeScaler.w+timeScaler.x+5,cnv.y);
+      PButton.size(50,PButton.height);
+      PButton.mouseReleased(function(){
         if(Pause){
           Pause=false;
-          a.style('background-color', null);
+          PButton.style('background-color', null);
         }else {
           Pause = true;
-          a.style('background-color', color(selected));
+          PButton.style('background-color', color(selected));
         }
       });
-      var b = createButton("Stop Rotation");
-      b.class("button");
-      b.position(timeScaler.w+timeScaler.x+5,21);
-      b.size(110,a.height);
-      b.mouseReleased(function(){
+      SRButton = createButton("Stop Rotation");
+      SRButton.class("button");
+      SRButton.position(timeScaler.w+timeScaler.x+5,cnv.y+21);
+      SRButton.size(110,PButton.height);
+      SRButton.mouseReleased(function(){
         if(StopRotation){
           StopRotation=false;
-          b.style('background-color', null);
+          SRButton.style('background-color', null);
         }else {
           StopRotation = true;
-          b.style('background-color', color(selected));
+          SRButton.style('background-color', color(selected));
         }
       });
-      var c = createButton("Pan");
-      c.class("button");
-      c.position(a.width+a.x+5,0);
-      c.size(50,a.height);
-      c.mouseReleased(function(){
+      PANButton = createButton("Pan");
+      PANButton.class("button");
+      PANButton.position(PButton.width+PButton.x+10,cnv.y);
+      PANButton.size(50,PButton.height);
+      PANButton.mouseReleased(function(){
         if(Pan){
           DragY -= 130
           Pan=false;
           camera(0, 0, 1, 0, 0, 0, 0, 1, 0);
-          c.style('background-color', null);
+          PANButton.style('background-color', null);
         }else {
           Pan = true;
           DragY += 130
           camera(0, Player.panHeight, Player.panHeight, 0, 0, 0, 0, 1, 0);
-          c.style('background-color', color(selected));
+          PANButton.style('background-color', color(selected));
         }
       });
-      untravel = createButton("Travel");
+      untravel = createButton("Unfollow");
       untravel.class("text");
-      untravel.position(a.width+a.x+5,a.height);
-      untravel.size(50,a.height);
+      untravel.position(PANButton.width+PANButton.x+5,cnv.y+PANButton.height);
+      untravel.size(70,PButton.height);
       untravel.style('background-color', "grey");
       untravel.attribute('disabled', '');
       untravel.mouseReleased(function(){
@@ -917,7 +964,6 @@
         untravel.class("text");
         Player.isFollowing = false;
       });
-
     }
     function screen(imageURL){
       this.image = createButton("");
@@ -983,6 +1029,10 @@
       this.input.position(x,y+h);
       this.input.size(w,h);
 
+      this.redraw = function(x,y){
+        this.text.text.position(x,y);
+        this.input.position(x,y+h);
+      }
       this.show = function(){
         this.input.show();
         this.text.show();
@@ -1026,9 +1076,10 @@
 
       this.MainButton.mouseReleased(function(){
         if(!Parent.textureDropdown.ShowList){
+          // console.log(true);
           textureScrollAmount = 3;
           for (var i = 0; i < scrollSize; i++) {
-            Parent.textureDropdown.subButton[i].position(x,y+(i*h)+2*h);
+            Parent.textureDropdown.subButton[i].position(Parent.textureDropdown.x,Parent.textureDropdown.y+(i*Parent.textureDropdown.h)+2*Parent.textureDropdown.h);
             Parent.textureDropdown.subButton[i].show();
           }
           Parent.textureDropdown.ShowList = true;
@@ -1041,12 +1092,28 @@
       });
 
       this.redraw = function(){
-        for (var i = 0; i < Parent.textureDropdown.subButton.length; i++) {
-          Parent.textureDropdown.subButton[i].hide();
+        for (var i = 0; i < this.subButton.length; i++) {
+          this.subButton[i].hide();
         }
         for (var i = 0; i < scrollSize; i++) {
-          Parent.textureDropdown.subButton[i+textureScrollAmount-(scrollSize-1)].position(x,y+(i*h)+2*h);
-          Parent.textureDropdown.subButton[i+textureScrollAmount-(scrollSize-1)].show();
+          this.subButton[i+textureScrollAmount-(scrollSize-1)].position(this.x,this.y+(i*this.h)+2*this.h);
+          this.subButton[i+textureScrollAmount-(scrollSize-1)].show();
+        }
+      }
+      this.redrawPosition = function(x,y,w,h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.mainText.text.position(x,y);
+        this.mainText.text.size(w,h);
+        this.MainButton.position(x,y+h);
+        this.MainButton.size(w,h);
+        for (var i = 0; i < this.subButton.length; i++) {
+          this.subButton[i].size(w,h);
+        }
+        for (var i = 0; i < scrollSize; i++) {
+          this.subButton[i+textureScrollAmount-(scrollSize-1)].position(x,y+(i*h)+2*h);
         }
       }
 
@@ -1096,7 +1163,7 @@
           orbitScrollAmount = 3;
           for (var i = 0; i < scrollSize; i++) {
             if(Parent.orbitDropdown.subButton[i].elt.textContent !== ""){
-              Parent.orbitDropdown.subButton[i].position(x,y+(i*h)+2*h);
+              Parent.orbitDropdown.subButton[i].position(this.x,this.y+(i*this.h)+2*this.h);
               Parent.orbitDropdown.subButton[i].show();
             }
           }
@@ -1169,14 +1236,30 @@
       }
 
       this.redraw = function(){
-        for (var i = 0; i < Parent.orbitDropdown.subButton.length; i++) {
-          Parent.orbitDropdown.subButton[i].hide();
+        for (var i = 0; i < this.subButton.length; i++) {
+          this.subButton[i].hide();
         }
         for (var i = 0; i < scrollSize; i++) {
-          if(Parent.orbitDropdown.subButton[i+orbitScrollAmount-(scrollSize-1)].elt.textContent !== ""){
-            Parent.orbitDropdown.subButton[i+orbitScrollAmount-(scrollSize-1)].position(x,y+(i*h)+2*h);
-            Parent.orbitDropdown.subButton[i+orbitScrollAmount-(scrollSize-1)].show();
+          if(this.subButton[i+orbitScrollAmount-(scrollSize-1)].elt.textContent !== ""){
+            this.subButton[i+orbitScrollAmount-(scrollSize-1)].position(this.x,this.y+(i*this.h)+2*this.h);
+            this.subButton[i+orbitScrollAmount-(scrollSize-1)].show();
           }
+        }
+      }
+      this.redrawPosition = function(x,y,w,h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.mainText.text.position(x,y);
+        this.mainText.text.size(w,h);
+        this.MainButton.position(x,y+h);
+        this.MainButton.size(w,h);
+        for (var i = 0; i < this.subButton.length; i++) {
+          this.subButton[i].size(w,h);
+        }
+        for (var i = 0; i < scrollSize; i++) {
+          this.subButton[i+orbitScrollAmount-(scrollSize-1)].position(x,y+(i*h)+2*h);
         }
       }
 
@@ -1257,6 +1340,20 @@
         this.slider.value(num);
       }
 
+      this.redraw = function(x,y,w,h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.text.text.position(x,y);
+        this.text.text.size(w+4, h);
+        this.number.position(x, y+h);
+        this.number.size(w+4, h);
+        this.numberInput.position(x,y+h);
+        this.numberInput.size(w+4,h-2);
+        this.slider.position(x,y+h+h);
+        this.slider.size(w,h);
+      }
       this.hide = function(){
         this.text.hide();
         this.number.hide();
@@ -1285,7 +1382,7 @@
         temp.style("background-repeat: no-repeat");
         temp.style("background-size: cover");
         temp.size(width/10,25);
-        temp.position(settingX+(width-settingX)/4,i*30+30);
+        temp.position(cnv.x+settingX+(width-settingX)/4,i*30+30+cnv.y);
         this.solarButton.push(temp);
       }
       for (var j = 0; j < this.solarButton.length; j++) {
@@ -1318,10 +1415,15 @@
       //   SolarSystem[i].MainButton = new createPlanetSetting(Planets[i].name,i,settingX+(width-settingX)/4,i*30+30,Planets[i].name);
       // }
       this.redraw = function(){
-        for(var i = 0; i <   MainSetting.solarButton.length; i++){
-          MainSetting.solarButton[i].position(settingX+50,i*30+30);
+        wdh = width-settingX
+        hX = settingX+(wdh/40);
+        hW = wdh-(wdh/20);
+        for(var i = 0; i <   this.solarButton.length; i++){
+          this.solarButton[i].position(cnv.x+hX+(hW-(width/15))/2,i*30+30+cnv.y);
+          this.solarButton[i].size(width/10,25);
         }
-        MainSetting.create.position(settingX+50,  MainSetting.solarButton.length*30+30);
+        this.create.position(cnv.x+settingX+50, this.solarButton.length*30+30+cnv.y);
+        this.create.size(width/10,25);
       }
       this.hide = function(){
         for(var i = 0; i <   MainSetting.solarButton.length; i++){
@@ -1334,7 +1436,7 @@
         for(var i = 0; i <   MainSetting.solarButton.length; i++){
             MainSetting.solarButton[i].show();
         }
-        this.create.position(settingX+(width-settingX)/4,MainSetting.solarButton.length*30+30);
+        this.create.position(cnv.x+settingX+(width-settingX)/4,MainSetting.solarButton.length*30+30+cnv.y);
         this.create.hide();
       }
     }
@@ -1344,14 +1446,14 @@
       h1x = width-(wdh/1.4);
       this.isShown = false;
       this.currentList = -1
-      this.heading = new Text("",settingX+(wdh/40),40,wdh-(wdh/20),40);
+      this.heading = new Text("",cnv.x+settingX+(wdh/40),40+cnv.y,wdh-(wdh/20),40);
       this.goto = createButton('GoTo');
       this.goto.class("button");
-      this.goto.position(SButton.x-58.23,5);
+      this.goto.position(SButton.x-58.23,cnv.y+5);
       this.goto.mouseReleased(function(){Player.x = SolarSystem[SolarSetting.currentList].x - 3600; Player.y = SolarSystem[SolarSetting.currentList].y - 3600; Player.z = SolarSystem[SolarSetting.currentList].z + 2000; DragX = 63; DragY = 626;});
       this.back = createButton('Back');
       this.back.class("button");
-      this.back.position(SButton.x-58.23-47.58-10,5);
+      this.back.position(SButton.x-58.23-47.58-10,cnv.y+5);
       this.back.mouseReleased(function(){
         MainSetting.isShown = true;
         SolarSetting.isShown = false;
@@ -1362,7 +1464,7 @@
       for (var i = 0; i*30+90 < height; i++) {
         temp = createButton("");
         temp.class("button PlanetButton");
-        temp.position(hX+(hW-(width/10))/2,i*30+90);
+        temp.position(cnv.x+hX+(hW-(width/10))/2,i*30+90+cnv.y);
         temp.size(width/10,25);
         this.planetButton.push(temp);
       }
@@ -1394,6 +1496,28 @@
         SolarSetting.isShown = false;
       });
 
+      this.redraw = function() {
+        wdh = width-settingX
+        mtx = width-(wdh/1.2);
+        h1x = width-(wdh/1.4);
+        hX = settingX+(wdh/40);
+        hW = wdh-(wdh/20);
+        this.heading.text.position(cnv.x+settingX+(wdh/40),40+cnv.y);
+        this.heading.text.size(wdh-(wdh/20),40);
+        this.goto.position(SButton.x-58.23,cnv.y+5);
+        if (width < 630) {
+          this.back.position(SButton.x-58.23,this.heading.text.y);
+        }else {
+          this.back.position(SButton.x-58.23-47.58-10,cnv.y+5);
+        }
+        for (var i = 0; i < this.planetButton.length; i++) {
+          this.planetButton[i].position(cnv.x+hX+(hW-(width/10))/2,i*30+90+cnv.y);
+          this.planetButton[i].size(width/10,25);
+        }
+        this.create.position(cnv.x+hX+(hW-(width/10))/2,i*30+90+cnv.y);
+        this.create.size(width/10,25);
+      }
+
       this.show = function(index) {
         this.currentList = index;
         this.heading.setText(SolarSystem[index].name);
@@ -1407,7 +1531,7 @@
           this.planetButton[i].style("background-size: cover");
           this.planetButton[i].show();
         }
-        this.create.position(hX+(hW-(width/10))/2,i*30+90);
+        this.create.position(cnv.x+hX+(hW-(width/10))/2,i*30+90+cnv.y);
         this.create.hide();
         this.goto.show();
         this.back.show();
@@ -1430,13 +1554,13 @@
       h1x = width-(wdh/1.4);
       this.isShown = false;
       this.currentList = [-1,-1]
-      this.MainText = new Text("",mtx,40,wdh/(10/7),wdh/(20/7));
+      this.MainText = new Text("",cnv.x+mtx,cnv.y+40,wdh/(10/7),wdh/(20/7));
       // this.MainText.text.style("background","url(UI-Textures/"+fileName+".jpg)");
       // this.MainText.text.style("background-size: cover");
       // this.MainText.text.style("color","white");
       this.travelTo = createButton("Follow");
       this.travelTo.class("button");
-      this.travelTo.position(SButton.x-58.23-5,5);
+      this.travelTo.position(SButton.x-58.23-5,cnv.y+5);
       this.travelTo.mouseReleased(function(){
         if(!Player.isFollowing){
           Player.isFollowing = true;
@@ -1462,7 +1586,7 @@
       });
       this.back = createButton('Back');
       this.back.class("button");
-      this.back.position(SButton.x-58.23-47.58-10,5);
+      this.back.position(SButton.x-58.23-47.58-10,cnv.y+5);
       this.back.mouseReleased(function(){
         cList = [PlanetSetting.currentList[0], -1];
         PlanetSetting.isShown = false;
@@ -1471,17 +1595,17 @@
       inx = settingX+(200-173)/2;
       iny = 60+wdh/(20/7);
       yStep = (height/62.5)+42;
-      this.distinceInput = new Input("Orbit Distince",inx,iny,wdh/(200/173),21,"number",100);
+      this.distinceInput = new Input("Orbit Distince",cnv.x+inx,cnv.y+iny,wdh/(200/173),21,"number",100);
       this.distinceInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].distince = PlanetSetting.distinceInput.input.value(); });
-      this.sizeInput = new Input("Size",inx,iny+yStep,wdh/(200/173),21,"number",50);
+      this.sizeInput = new Input("Size",cnv.x+inx,cnv.y+iny+yStep,wdh/(200/173),21,"number",50);
       this.sizeInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].size = PlanetSetting.sizeInput.input.value(); });
-      this.SSpeedInput = new Input("Spin Speed",inx,iny+yStep*2,wdh/(200/173),21,"number",1);
+      this.SSpeedInput = new Input("Spin Speed",cnv.x+inx,cnv.y+iny+yStep*2,wdh/(200/173),21,"number",1);
       this.SSpeedInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].Sspeed = PlanetSetting.SSpeedInput.input.value(); });
-      this.OSpeedInput = new Input("Orbit Speed",inx,iny+yStep*3,wdh/(200/173),21,"number",.5);
+      this.OSpeedInput = new Input("Orbit Speed",cnv.x+inx,cnv.y+iny+yStep*3,wdh/(200/173),21,"number",.5);
       this.OSpeedInput.input.input(function(){ SolarSystem[PlanetSetting.currentList[0]].planets[PlanetSetting.currentList[1]].Ospeed = PlanetSetting.OSpeedInput.input.value(); });
-      this.RevolutionSlider = new Slider("Revolution",-TWO_PI,TWO_PI,0,.000000001,inx,iny+yStep*4,wdh/(200/173),21);
-      this.textureDropdown = new TextureDropdown("Texture",-1,inx,iny+yStep*5+21,(wdh*3)/7,21,this);
-      this.orbitDropdown = new OrbitDropdown("Orbit",-1,inx+(wdh*4)/9,iny+yStep*5+21,(wdh*3)/7,21,this);
+      this.RevolutionSlider = new Slider("Revolution",-TWO_PI,TWO_PI,0,.000000001,cnv.x+inx,cnv.y+iny+yStep*4,wdh/(200/173),21);
+      this.textureDropdown = new TextureDropdown("Texture",-1,cnv.x+inx,cnv.y+iny+yStep*5+21,(wdh*3)/7,21,this);
+      this.orbitDropdown = new OrbitDropdown("Orbit",-1,cnv.x+inx+(wdh*4)/9,cnv.y+iny+yStep*5+21,(wdh*3)/7,21,this);
       // this.delete = createButton("Delete");
       // this.delete.class("button");
       // this.delete.position(settingX+((wdh/2)-(58.25/2)),iny+305);
@@ -1490,6 +1614,29 @@
       //   Planets.splice(index,1);
       //   Setting.redraw();
       // });
+      this.redraw = function() {
+        wdh = width-settingX
+        mtx = width-(wdh/1.2);
+        h1x = width-(wdh/1.4);
+        inx = settingX+(200-173)/2;
+        iny = 60+wdh/(20/7);
+        yStep = (height/62.5)+42;
+        this.MainText.text.position(cnv.x+mtx,cnv.y+40);
+        this.travelTo.position(SButton.x-58.23-5,cnv.y+5);
+        if (width < 630) {
+          this.back.position(SButton.x-58.23,this.MainText.text.y);
+        }else {
+          this.back.position(SButton.x-58.23-47.58-10,cnv.y+5);
+        }
+        this.distinceInput.redraw(cnv.x+inx,cnv.y+iny);
+        this.sizeInput.redraw(cnv.x+inx,cnv.y+iny+yStep);
+        this.SSpeedInput.redraw(cnv.x+inx,cnv.y+iny+yStep*2);
+        this.OSpeedInput.redraw(cnv.x+inx,cnv.y+iny+yStep*3);
+        this.RevolutionSlider.redraw(cnv.x+inx,cnv.y+iny+yStep*4);
+        this.textureDropdown.redrawPosition(cnv.x+inx,cnv.y+iny+yStep*5+21,(wdh*3)/7,21);
+        this.orbitDropdown.redrawPosition(cnv.x+inx+(wdh*4)/9,cnv.y+iny+yStep*5+21,(wdh*3)/7,21);
+      }
+
       this.show = function(solarIndex, planetIndex){
         this.currentList = [solarIndex, planetIndex];
         this.MainText.show();
