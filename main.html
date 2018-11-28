@@ -343,10 +343,10 @@
     }
     function draw() {
       CANUPDATE++;
-      if(CANUPDATE>2){
+      if(CANUPDATE>5){
         centerCanvas();
         redrawCvs();
-        CANUPDATE %= 2;
+        CANUPDATE %= 5;
       }
       if(!Pause){
         updateVarables();
