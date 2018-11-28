@@ -139,7 +139,7 @@
     var cnv;
     var SButton,GButton,PButton,SRButton,PANButton,untravel,fullscreen;
     var RESIZE = true;
-    var aspectRatio = displayWidth/displayHeight
+    var aspectRatio;
 
     function preload() {
       loadLowRes();
@@ -269,6 +269,7 @@
       PlanetSetting.redraw();
     }
     function setup() {
+      aspectRatio = displayWidth/displayHeight;
       // cnv = createCanvas(displayWidth, displayHeight,WEBGL);
       cnv = createCanvas(windowWidth/1.3, (windowHeight/1.3)-4,WEBGL);
       centerCanvas();
