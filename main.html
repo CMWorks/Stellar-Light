@@ -165,7 +165,7 @@
     }
     function loadLowRes(){
       /*Low Res 6mb*/
-      new Texture("Star",'https://cmworks.github.io/Stellar-Light/Textures/Low/SkyMid.jpg', TextureArray);
+      new Texture("Star",'https://cmworks.github.io/Stellar-Light/Textures/Low/Sky.jpg', TextureArray);
       new Texture("Sun",'https://cmworks.github.io/Stellar-Light/Textures/Low/Sun.jpg', TextureArray);
       new Texture("Mercury",'https://cmworks.github.io/Stellar-Light/Textures/Low/Mercury.jpg', TextureArray);
       new Texture("Venus",'https://cmworks.github.io/Stellar-Light/Textures/Low/Venus.jpg', TextureArray);
@@ -286,13 +286,13 @@
       slc = false;
       while (!slc) {
         planetNUM = prompt("How many planets do you want?",9);
-        astroid = prompt("How many astroids do you want?",0);
+        //astroid = prompt("How many astroids do you want?",0);
         if (planetNUM != null) {
           slc = true;
         }
-        if (astroid != null) {
-          slc = true;
-        }
+//         if (astroid != null) {
+//           slc = true;
+//         }
       }
       if (planetNUM - 1 >= 0) {
         Sun = new Planet("Sun",1000,0,.87,0,0,0,0,1,"Sun");
