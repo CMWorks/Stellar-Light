@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Stellar Light</title>
-    <link rel="shortcut icon" type="image/png" href="https://cmworks.github.io/Stellar-Light/UI-Textures/favicon.png"/>
+    <title>Stellar Night</title>
+    <link rel="shortcut icon" type="image/png" href="https://cmworks.github.io/Stellar-Night/UI-Textures/favicon.png"/>
     <meta name="viewport" width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0>
     <style> body {background-image: url("https://cmworks.github.io/src/background.png");background-size: cover;} </style>
     <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
@@ -80,7 +80,7 @@
       }
       .full {
         background-color: Transparent;
-        background-image: url("https://cmworks.github.io/Stellar-Light/UI-Textures/fullscreen.png");
+        background-image: url("https://cmworks.github.io/Stellar-Night/UI-Textures/fullscreen.png");
         background-size: cover;
         border: none;
       }
@@ -90,7 +90,7 @@
     </style>
   </head>
   <body>
-    <h1>Stellar Light</h1>
+    <h1>Stellar Night</h1>
     <script>
     var SolarSystem = [];
     var Astroids = [];
@@ -150,56 +150,56 @@
     }
     function loadHighRes(){
       /*High Res 65mb*/
-      new Texture("Star",'https://cmworks.github.io/Stellar-Light/Textures/High/Sky.png', TextureArray);
-      new Texture("Sun",'https://cmworks.github.io/Stellar-Light/Textures/High/Sun.png', TextureArray);
-      new Texture("Mercury",'https://cmworks.github.io/Stellar-Light/Textures/High/Mercury.png', TextureArray);
-      new Texture("Venus",'https://cmworks.github.io/Stellar-Light/Textures/High/Venus.png', TextureArray);
-      new Texture("Earth",'https://cmworks.github.io/Stellar-Light/Textures/High/EarthDay.png', TextureArray);
-      new Texture("Moon",'https://cmworks.github.io/Stellar-Light/Textures/High/Moon.png', TextureArray);
-      new Texture("Mars",'https://cmworks.github.io/Stellar-Light/Textures/High/Mars.png', TextureArray);
-      new Texture("Jupiter",'https://cmworks.github.io/Stellar-Light/Textures/High/Jupiter.png', TextureArray);
-      new Texture("Saturn",'https://cmworks.github.io/Stellar-Light/Textures/High/Saturn.png', TextureArray);
-      new Texture("Uranus",'https://cmworks.github.io/Stellar-Light/Textures/High/Uranus.png', TextureArray);
-      new Texture("Neptune",'https://cmworks.github.io/Stellar-Light/Textures/High/Neptune.png', TextureArray);
-      new Texture("Astroid1",'https://cmworks.github.io/Stellar-Light/Textures/High/Astroid1.png', TextureArray);
-      new Texture("Astroid2",'https://cmworks.github.io/Stellar-Light/Textures/High/Astroid2.png', TextureArray);
-      new Texture("Astroid3",'https://cmworks.github.io/Stellar-Light/Textures/High/Astroid3.png', TextureArray);
-      new Texture("Astroid4",'https://cmworks.github.io/Stellar-Light/Textures/High/Astroid4.png', TextureArray);
+      new Texture("Star",'https://cmworks.github.io/Stellar-Night/Textures/High/Sky.png', TextureArray);
+      new Texture("Sun",'https://cmworks.github.io/Stellar-Night/Textures/High/Sun.png', TextureArray);
+      new Texture("Mercury",'https://cmworks.github.io/Stellar-Night/Textures/High/Mercury.png', TextureArray);
+      new Texture("Venus",'https://cmworks.github.io/Stellar-Night/Textures/High/Venus.png', TextureArray);
+      new Texture("Earth",'https://cmworks.github.io/Stellar-Night/Textures/High/EarthDay.png', TextureArray);
+      new Texture("Moon",'https://cmworks.github.io/Stellar-Night/Textures/High/Moon.png', TextureArray);
+      new Texture("Mars",'https://cmworks.github.io/Stellar-Night/Textures/High/Mars.png', TextureArray);
+      new Texture("Jupiter",'https://cmworks.github.io/Stellar-Night/Textures/High/Jupiter.png', TextureArray);
+      new Texture("Saturn",'https://cmworks.github.io/Stellar-Night/Textures/High/Saturn.png', TextureArray);
+      new Texture("Uranus",'https://cmworks.github.io/Stellar-Night/Textures/High/Uranus.png', TextureArray);
+      new Texture("Neptune",'https://cmworks.github.io/Stellar-Night/Textures/High/Neptune.png', TextureArray);
+      new Texture("Astroid1",'https://cmworks.github.io/Stellar-Night/Textures/High/Astroid1.png', TextureArray);
+      new Texture("Astroid2",'https://cmworks.github.io/Stellar-Night/Textures/High/Astroid2.png', TextureArray);
+      new Texture("Astroid3",'https://cmworks.github.io/Stellar-Night/Textures/High/Astroid3.png', TextureArray);
+      new Texture("Astroid4",'https://cmworks.github.io/Stellar-Night/Textures/High/Astroid4.png', TextureArray);
       Pause = false;
     }
     function loadLowRes(){
       /*Low Res 6mb*/
-      new Texture("Star",'https://cmworks.github.io/Stellar-Light/Textures/Low/Sky.jpg', TextureArray);
-      new Texture("Sun",'https://cmworks.github.io/Stellar-Light/Textures/Low/Sun.jpg', TextureArray);
-      new Texture("Mercury",'https://cmworks.github.io/Stellar-Light/Textures/Low/Mercury.jpg', TextureArray);
-      new Texture("Venus",'https://cmworks.github.io/Stellar-Light/Textures/Low/Venus.jpg', TextureArray);
-      new Texture("Earth",'https://cmworks.github.io/Stellar-Light/Textures/Low/EarthDay.jpg', TextureArray);
-      new Texture("Moon",'https://cmworks.github.io/Stellar-Light/Textures/Low/Moon.jpg', TextureArray);
-      new Texture("Mars",'https://cmworks.github.io/Stellar-Light/Textures/Low/Mars.jpg', TextureArray);
-      new Texture("Jupiter",'https://cmworks.github.io/Stellar-Light/Textures/Low/Jupiter.jpg', TextureArray);
-      new Texture("Saturn",'https://cmworks.github.io/Stellar-Light/Textures/Low/Saturn.jpg', TextureArray);
-      new Texture("Uranus",'https://cmworks.github.io/Stellar-Light/Textures/Low/Uranus.jpg', TextureArray);
-      new Texture("Neptune",'https://cmworks.github.io/Stellar-Light/Textures/Low/Neptune.jpg', TextureArray);
-      new Texture("Astroid1",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid1.jpg', TextureArray);
-      new Texture("Astroid2",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid2.jpg', TextureArray);
-      new Texture("Astroid3",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid3.jpg', TextureArray);
-      new Texture("Astroid4",'https://cmworks.github.io/Stellar-Light/Textures/Low/Astroid4.jpg', TextureArray);
+      new Texture("Star",'https://cmworks.github.io/Stellar-Night/Textures/Low/Sky.jpg', TextureArray);
+      new Texture("Sun",'https://cmworks.github.io/Stellar-Night/Textures/Low/Sun.jpg', TextureArray);
+      new Texture("Mercury",'https://cmworks.github.io/Stellar-Night/Textures/Low/Mercury.jpg', TextureArray);
+      new Texture("Venus",'https://cmworks.github.io/Stellar-Night/Textures/Low/Venus.jpg', TextureArray);
+      new Texture("Earth",'https://cmworks.github.io/Stellar-Night/Textures/Low/EarthDay.jpg', TextureArray);
+      new Texture("Moon",'https://cmworks.github.io/Stellar-Night/Textures/Low/Moon.jpg', TextureArray);
+      new Texture("Mars",'https://cmworks.github.io/Stellar-Night/Textures/Low/Mars.jpg', TextureArray);
+      new Texture("Jupiter",'https://cmworks.github.io/Stellar-Night/Textures/Low/Jupiter.jpg', TextureArray);
+      new Texture("Saturn",'https://cmworks.github.io/Stellar-Night/Textures/Low/Saturn.jpg', TextureArray);
+      new Texture("Uranus",'https://cmworks.github.io/Stellar-Night/Textures/Low/Uranus.jpg', TextureArray);
+      new Texture("Neptune",'https://cmworks.github.io/Stellar-Night/Textures/Low/Neptune.jpg', TextureArray);
+      new Texture("Astroid1",'https://cmworks.github.io/Stellar-Night/Textures/Low/Astroid1.jpg', TextureArray);
+      new Texture("Astroid2",'https://cmworks.github.io/Stellar-Night/Textures/Low/Astroid2.jpg', TextureArray);
+      new Texture("Astroid3",'https://cmworks.github.io/Stellar-Night/Textures/Low/Astroid3.jpg', TextureArray);
+      new Texture("Astroid4",'https://cmworks.github.io/Stellar-Night/Textures/Low/Astroid4.jpg', TextureArray);
       Pause = false;
     }
     function loadAssets(){
-      new Texture("Defult",'https://cmworks.github.io/Stellar-Light/UI-Textures/defult.jpg', Assets);
-      new Texture("Earth",'https://cmworks.github.io/Stellar-Light/UI-Textures/Earth.jpg', Assets);
-      new Texture("EarthNight",'https://cmworks.github.io/Stellar-Light/UI-Textures/EarthNight.jpg', Assets);
-      new Texture("Jupiter",'https://cmworks.github.io/Stellar-Light/UI-Textures/Jupiter.jpg', Assets);
-      new Texture("Mars",'https://cmworks.github.io/Stellar-Light/UI-Textures/Mars.jpg', Assets);
-      new Texture("Mercury",'https://cmworks.github.io/Stellar-Light/UI-Textures/Mercury.jpg', Assets);
-      new Texture("Moon",'https://cmworks.github.io/Stellar-Light/UI-Textures/Moon.jpg', Assets);
-      new Texture("Neptune",'https://cmworks.github.io/Stellar-Light/UI-Textures/Neptune.jpg', Assets);
-      new Texture("Saturn",'https://cmworks.github.io/Stellar-Light/UI-Textures/Saturn.jpg', Assets);
-      new Texture("Sky",'https://cmworks.github.io/Stellar-Light/UI-Textures/Sky.jpg', Assets);
-      new Texture("Sun",'https://cmworks.github.io/Stellar-Light/UI-Textures/Sun.jpg', Assets);
-      new Texture("Uranus",'https://cmworks.github.io/Stellar-Light/UI-Textures/Uranus.jpg', Assets);
-      new Texture("Venus",'https://cmworks.github.io/Stellar-Light/UI-Textures/Venus.jpg', Assets);
+      new Texture("Defult",'https://cmworks.github.io/Stellar-Night/UI-Textures/defult.jpg', Assets);
+      new Texture("Earth",'https://cmworks.github.io/Stellar-Night/UI-Textures/Earth.jpg', Assets);
+      new Texture("EarthNight",'https://cmworks.github.io/Stellar-Night/UI-Textures/EarthNight.jpg', Assets);
+      new Texture("Jupiter",'https://cmworks.github.io/Stellar-Night/UI-Textures/Jupiter.jpg', Assets);
+      new Texture("Mars",'https://cmworks.github.io/Stellar-Night/UI-Textures/Mars.jpg', Assets);
+      new Texture("Mercury",'https://cmworks.github.io/Stellar-Night/UI-Textures/Mercury.jpg', Assets);
+      new Texture("Moon",'https://cmworks.github.io/Stellar-Night/UI-Textures/Moon.jpg', Assets);
+      new Texture("Neptune",'https://cmworks.github.io/Stellar-Night/UI-Textures/Neptune.jpg', Assets);
+      new Texture("Saturn",'https://cmworks.github.io/Stellar-Night/UI-Textures/Saturn.jpg', Assets);
+      new Texture("Sky",'https://cmworks.github.io/Stellar-Night/UI-Textures/Sky.jpg', Assets);
+      new Texture("Sun",'https://cmworks.github.io/Stellar-Night/UI-Textures/Sun.jpg', Assets);
+      new Texture("Uranus",'https://cmworks.github.io/Stellar-Night/UI-Textures/Uranus.jpg', Assets);
+      new Texture("Venus",'https://cmworks.github.io/Stellar-Night/UI-Textures/Venus.jpg', Assets);
     }
     function Texture(name, url, saveArray){
       this.name = name;
