@@ -1,2 +1,2 @@
 # Stellar-Night
-Space and shit
+Space and stuff
